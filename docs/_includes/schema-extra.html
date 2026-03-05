@@ -1,0 +1,38 @@
+{%- assign u = page.url | default: "" -%}
+
+{%- if u == "CyberSocial/TelephonePollPoisoning/index.html" -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "{{ page.url | absolute_url }}#webpage",
+      "url": "{{ page.url | absolute_url }}",
+      "name": "{{ page.title | default: site.title | escape }}",
+      "description": "{{ page.excerpt | strip_html | strip_newlines | truncate: 160 | default: site.description | escape }}",
+      "mainEntity": { "@id": "https://doi.org/10.5281/zenodo.18817302" }
+    },
+    {
+      "@type": "ScholarlyArticle",
+      "@id": "https://doi.org/10.5281/zenodo.18817302",
+      "identifier": "https://doi.org/10.5281/zenodo.18817302",
+      "url": "https://doi.org/10.5281/zenodo.18817302",
+      "headline": "Telephone Poll Poisoning via Mass Voice SIMs: Emerging Threats to Public Opinion Research",
+      "image": ["{{ '/assets/css/images/TelephonePollPoisoning.image1.jpg' | absolute_url }}"],
+      "author": {
+        "@type": "Person",
+        "name": "Hajime Tsui",
+        "url": "https://x.com/hajimetwi3",
+        "sameAs": ["https://x.com/hajimetwi3"]
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Zenodo"
+      },
+      "inLanguage": "en"
+    }
+  ]
+}
+</script>
+{%- endif -%}
