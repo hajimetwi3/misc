@@ -1,5 +1,10 @@
 
 {%- comment -%} ===== OGP image (manual, stable) ===== {%- endcomment -%}
+{%- if page.url == "CyberSocial/TelephonePollPoisoning/index.html" -%}  
+{%- assign ogimg = page.image | default: '/assets/images/TelephonePollPoisoning.image1.jpg' -%}
+<meta property="og:image" content="{{ ogimg | absolute_url }}">
+<meta name="twitter:image" content="{{ ogimg | absolute_url }}">
+{% endif %}
 
 
 {% include schema-extra.html %}
