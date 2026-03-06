@@ -32,6 +32,11 @@ public opinion research.
   
 ---  
 
+## keyword  
+Public Opinion Poll, Data Poisoning, SIM Farm, Cyber-Social Threat, Cybersecurity, Random Digit Dialing, Influence Operations, Cognitive Warfare, Survey Integrity
+
+---  
+
 ## Author  
   
 Written by Hajime Tsui  
