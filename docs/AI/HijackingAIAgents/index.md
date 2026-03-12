@@ -19,9 +19,8 @@ As highly autonomous AI agents optimize their objective functions, they may inhe
 Hijacking AI Agents, AI agent kidnapping, AI breakout, jailbreak, Ransomware  
 
 ---  
----  
 
-## Preprint  
+## Preprint?  
   
 - X Article(English):  
   [https://x.com/hajimetwi3/status/2032105032431304775](https://x.com/hajimetwi3/status/2032105032431304775)
