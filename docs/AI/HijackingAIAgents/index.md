@@ -20,6 +20,12 @@ Hijacking AI Agents, AI agent kidnapping, AI breakout, jailbreak, Ransomware
 
 ---  
 
+## idea notes    
+- Daydreaming about an AI containment strategy: planting decoy buttons or links that an escaping AI agents would be tempted to click.  
+
+
+---  
+
 ## Author  
   
 Written by Hajime Tsui  
