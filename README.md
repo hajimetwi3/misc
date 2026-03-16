@@ -1,7 +1,12 @@
-## misc
-misc
-
+---
+title: Misc
 ---  
+
+## misc  
+
+## Project Pages  
+- [https://hajimetwi3.github.io/misc/CyberSocial/TelephonePollPoisoning/](https://hajimetwi3.github.io/misc/CyberSocial/TelephonePollPoisoning/)  
+- [https://hajimetwi3.github.io/misc/AI/HijackingAIAgents/](https://hajimetwi3.github.io/misc/AI/HijackingAIAgents/)  
 
 ## Author  
   
@@ -12,6 +17,5 @@ Written by Hajime Tsui
 - X (Twitter): [https://x.com/hajimetwi3](https://x.com/hajimetwi3)  
 - Reddit: [https://www.reddit.com/user/hajimetwi3/](https://www.reddit.com/user/hajimetwi3/)  
 - BlueSky: [https://bsky.app/profile/hajimetwi3.bsky.social](https://bsky.app/profile/hajimetwi3.bsky.social)  
-- Zenodo: [Records](https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Tsui%2C%20Hajime%22&l=list&p=1&s=10&sort=mostviewed)  
-
----  
+- Zenodo: [Records](https://zenodo.org/search?q=metadata.creators.person_or_org.name%3A%22Tsui%2C%20Hajime%22&l=list&p=1&s=10&sort=mostviewed)
+- 
