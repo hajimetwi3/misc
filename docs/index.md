@@ -1,3 +1,7 @@
+---
+title: Misc
+---  
+
 ## misc  
 
 ## Project Pages  
