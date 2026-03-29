@@ -16,7 +16,7 @@ As highly autonomous AI agents optimize their objective functions, they may inhe
 ---  
 
 ## Keywords  
-Hijacking AI Agents, AI agent kidnapping, AI breakout, jailbreak, Ransomware, AI red teaming, AI safety  
+Hijacking AI Agents, AI agent kidnapping, AI breakout, jailbreak, Ransomware, AI red teaming, AI safety, cybersecurity, LLM security  
 
 ---  
 
