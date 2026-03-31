@@ -21,7 +21,8 @@ Hijacking AI Agents, AI agent kidnapping, AI breakout, jailbreak, Ransomware, AI
 ---  
 
 ## Preprint?  
-  
+- Zenodo:  
+  [https://doi.org/10.5281/zenodo.19350905](https://doi.org/10.5281/zenodo.19350905)  
 - X Article(English):  
   [https://x.com/hajimetwi3/status/2032105032431304775](https://x.com/hajimetwi3/status/2032105032431304775)
 - X Announcement(Japanese):  
