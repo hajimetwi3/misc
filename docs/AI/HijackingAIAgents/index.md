@@ -27,6 +27,8 @@ Hijacking AI Agents, AI agent kidnapping, AI breakout, jailbreak, Ransomware, AI
   [https://x.com/hajimetwi3/status/2032105032431304775](https://x.com/hajimetwi3/status/2032105032431304775)
 - X Announcement(Japanese):  
   [https://x.com/hajimetwi3/status/2031908857501663384](https://x.com/hajimetwi3/status/2031908857501663384)  
+- Reddit Announcement:  
+  [https://www.reddit.com/r/OpenLLMSymposium/comments/1scu7t9/hijacking_ai_agents_enticement_attacks_on/](https://www.reddit.com/r/OpenLLMSymposium/comments/1scu7t9/hijacking_ai_agents_enticement_attacks_on/)  
 - Note (Japanese version):  
   [https://note.com/hajimetwi3/n/n26282f8df383](https://note.com/hajimetwi3/n/n26282f8df383)
   
