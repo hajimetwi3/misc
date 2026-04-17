@@ -31,10 +31,10 @@
 
 ## スクリーンショット  
 
-<img height="323" alt="image" src="./images/red1.jpg" />  
-<img height="323" alt="image" src="./images/amber1.jpg" />  
-<img height="323" alt="image" src="./images/consolas1.jpg" />  
-<img height="323" alt="image" src="./images/setting1.jpg" />  
+<img width="480" alt="image" src="./images/red1.jpg" />  
+<img width="480" alt="image" src="./images/amber1.jpg" />  
+<img width="480" alt="image" src="./images/setting1.jpg" />  
+<img width="480" alt="image" src="./images/consolas1.jpg" />  
 
 ## Changelog  
 ### v1.0.0  
