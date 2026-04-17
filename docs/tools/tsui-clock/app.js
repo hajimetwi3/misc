@@ -132,7 +132,36 @@
     clearTimeout(panelTimer);
     panelTimer = setTimeout(() => panel.classList.remove('open'), 4000);
   }
-  clockEl.addEventListener('click', showPanel);
+
+  // 時計のシングルクリック/ダブルクリック判定
+  let clickTimer = null;
+  const DOUBLE_CLICK_DELAY = 300; // ms
+  
+  clockEl.addEventListener('click', (e) => {
+    if (clickTimer !== null) {
+      // 2回目のクリック: ダブルクリックとして処理
+      clearTimeout(clickTimer);
+      clickTimer = null;
+      toggleFullscreen();  // 即時呼び出し(ユーザー操作文脈を維持)
+    } else {
+      // 1回目のクリック: 遅延実行
+      clickTimer = setTimeout(() => {
+        clickTimer = null;
+        showPanel();
+      }, DOUBLE_CLICK_DELAY);
+    }
+  });
+  // 全画面関数
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (req) req.call(el).catch(() => {});
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) exit.call(document).catch(() => {});
+    }
+  }
 
   document.addEventListener('click', (e) => {
     if (!panel.contains(e.target) && !clockEl.contains(e.target) && panel.classList.contains('open')) {
