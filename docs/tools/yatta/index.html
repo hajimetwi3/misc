@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="シンプルな日次ルーチンチェック。データはブラウザ内のみに保存されます。">
+<meta name="theme-color" content="#fafaf9">
+<title>やった？(ver1.0)</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+    --accent: #2563eb;
+    --done: #10b981;
+    --danger: #dc2626;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #18181b;
+      --surface: #27272a;
+      --border: #3f3f46;
+      --text: #fafafa;
+      --muted: #a1a1aa;
+      --accent: #60a5fa;
+      --done: #34d399;
+      --danger: #f87171;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+    padding: 16px;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  header { margin-bottom: 20px; }
+  h1 { font-size: 20px; margin: 0 0 4px 0; font-weight: 700; }
+  .date { color: var(--muted); font-size: 13px; }
+  section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  h2 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Today */
+  .today-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .today-row:last-child { border-bottom: none; }
+  .today-row .name { flex: 1; font-size: 15px; min-width: 0; word-break: break-word; }
+  .slots { display: flex; gap: 6px; flex-shrink: 0; }
+  .slot-btn {
+    min-width: 48px;
+    height: 44px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.08s, background 0.15s;
+  }
+  .slot-btn.done {
+    background: var(--done);
+    border-color: var(--done);
+    color: #fff;
+  }
+  .slot-btn.wildcard:not(.done) {
+    border-style: dashed;
+  }
+  .slot-btn:active { transform: scale(0.94); }
+
+  /* Days grid */
+  .days-grid { overflow-x: auto; }
+  .days-header, .days-row {
+    display: grid;
+    grid-template-columns: minmax(80px, 1fr) repeat(3, 56px);
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .days-header > div {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    white-space: pre-line;
+    line-height: 1.2;
+    padding: 4px 0;
+  }
+  .days-header .today-col { color: var(--accent); font-weight: 700; }
+  .days-row .row-label {
+    font-size: 12.5px;
+    padding-right: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .days-row .row-label.expanded {
+    white-space: normal;
+    word-break: break-word;
+  }
+  .days-cell {
+    width: 56px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+  .days-cell.done { background: var(--done); border-color: var(--done); }
+  .days-cell.today-col { border-color: var(--accent); border-width: 2px; }
+  .days-cell:active { opacity: 0.7; }
+
+  /* Settings */
+  details { margin-bottom: 8px; }
+  details summary {
+    cursor: pointer;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid currentColor;
+    margin-right: 6px;
+    vertical-align: middle;
+    transition: transform 0.15s;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  .item-edit-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .item-edit-row input[type="text"] {
+    flex: 1 1 140px;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+  .slot-toggles { display: flex; gap: 3px; }
+  .slot-toggle {
+    width: 34px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .slot-toggle.wildcard { border-style: dashed; }
+  .slot-toggle.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    border-style: solid;
+  }
+  .btn {
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-top: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-danger {
+    color: var(--danger);
+    border-color: transparent;
+    background: transparent;
+    padding: 6px 10px;
+  }
+  .note {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .note-list {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 10px 0 0 0;
+    padding-left: 1.2em;
+  }
+  .note-list li { margin-bottom: 4px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px 8px;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>やった？<span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px">ver1.0</span></h1>
+    <div class="date" id="today-date"></div>
+  </header>
+
+  <section>
+    <h2>今日</h2>
+    <div id="today-list"></div>
+  </section>
+
+  <section>
+    <h2>直近3日</h2>
+    <div class="days-grid" id="days-grid"></div>
+  </section>
+
+  <section>
+    <details>
+      <summary>項目を編集</summary>
+      <div id="items-editor" style="margin-top:10px"></div>
+      <button class="btn btn-primary" id="add-item-btn">+ 項目を追加</button>
+      <p class="note">「他」は時刻に縛られないチェック用（ストレッチ・日記など、今日やったかだけ気にする項目に）</p>
+    </details>
+    <details>
+      <summary>データの保存・読み込み</summary>
+      <div style="margin-top:10px">
+        <button class="btn" id="export-btn">エクスポート (JSON)</button>
+        <button class="btn" id="import-btn">インポート</button>
+        <input type="file" id="import-file" accept=".json,application/json" hidden>
+        <p class="note">
+          エクスポートされるのは項目名と時間帯の設定のみです。<br>
+          チェック履歴は含まれません。
+        </p>
+        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+        <button class="btn" id="reset-btn" style="color:var(--danger);border-color:var(--danger)">すべて初期化</button>
+        <p class="note">項目とチェック履歴をすべて削除し、初期状態に戻します。</p>
+      </div>
+    </details>
+    <details>
+      <summary>注意事項</summary>
+      <ul class="note-list">
+        <li>このアプリはサーバーにデータを送信しません。すべてのデータはお使いのブラウザ内にのみ保存されます。</li>
+        <li>チェック履歴は直近3日分のみ保持されます。それ以前の履歴は自動的に削除されます。</li>
+        <li>ブラウザの設定で「Cookieとサイトデータ」を削除すると、保存データも消去されます。</li>
+        <li>長期間アクセスしない場合、ブラウザがデータを自動削除することがあります。</li>
+        <li>端末やブラウザが異なると、データは共有されません。項目設定はエクスポート・インポートで移行できます。</li>
+        <li>登録できる項目は最大100個までです。</li>
+        <li>インポートには、このアプリからエクスポートしたJSONファイルのみを使用してください。それ以外のファイルを読み込むと正しく動作しない場合があります。</li>
+        <li>本アプリは現状のまま提供されており、動作の保証はありません。利用によって生じた損害について、作成者は一切の責任を負いません。自己責任でご利用ください。</li>
+      </ul>
+    </details>
+    <details>
+      <summary>著者・ライセンス</summary>
+      <div class="note" style="margin-top:10px">
+        <p>作成者: <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener">Hajime Tsui</a><br>
+        X: <a href="https://x.com/hajimetwi3" target="_blank" rel="noopener">@hajimetwi3</a><br>
+        GitHub: <a href="https://github.com/hajimetwi3" target="_blank" rel="noopener">hajimetwi3</a></p>
+        <p style="margin-top:10px">MIT License<br>
+        Copyright (c) 2026 Hajime Tsui</p>
+        <p style="margin-top:6px">Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+        <p style="margin-top:6px">The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+        <p style="margin-top:6px">THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+<script>
+'use strict';
+
+const STORAGE_KEY = 'yatta_123456789';
+const LOG_KEEP_DAYS = 3;
+const SLOTS = [
+  { key: 'morning', label: '朝' },
+  { key: 'noon',    label: '昼' },
+  { key: 'evening', label: '晩' },
+  { key: 'other',   label: '他', wildcard: true },
+];
+const DAY_JP = ['日', '月', '火', '水', '木', '金', '土'];
+
+// ---------- State ----------
+function genId() {
+  return 'i_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.items)) {
+        if (!parsed.log || typeof parsed.log !== 'object') parsed.log = {};
+        return parsed;
+      }
+    }
+  } catch (e) { console.warn('load failed', e); }
+  return initialState();
+}
+
+function initialState() {
+  return {
+    items: [
+      { id: genId(), name: '薬',         slots: ['morning'] },
+      { id: genId(), name: '歯磨き',      slots: ['morning', 'evening'] },
+      { id: genId(), name: 'ストレッチ',  slots: ['other'] },
+    ],
+    log: {},
+  };
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    alert('保存に失敗しました: ' + e.message);
+  }
+}
+
+function pruneLog() {
+  const keepDates = new Set();
+  for (let i = 0; i < LOG_KEEP_DAYS; i++) {
+    keepDates.add(dateStr(dateOffset(-i)));
+  }
+  let changed = false;
+  Object.keys(state.log).forEach(date => {
+    if (!keepDates.has(date)) {
+      delete state.log[date];
+      changed = true;
+    }
+  });
+  if (changed) saveState();
+}
+
+let state = loadState();
+
+// ---------- Date helpers (LOCAL time) ----------
+function dateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function today() { return dateStr(new Date()); }
+function dateOffset(n) {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+// ---------- Log access ----------
+function isDone(date, itemId, slot) {
+  return !!(state.log[date] && state.log[date][itemId] && state.log[date][itemId][slot]);
+}
+function setDone(date, itemId, slot, done) {
+  if (done) {
+    if (!state.log[date]) state.log[date] = {};
+    if (!state.log[date][itemId]) state.log[date][itemId] = {};
+    state.log[date][itemId][slot] = true;
+  } else {
+    if (state.log[date] && state.log[date][itemId]) {
+      delete state.log[date][itemId][slot];
+      if (Object.keys(state.log[date][itemId]).length === 0) delete state.log[date][itemId];
+      if (Object.keys(state.log[date]).length === 0) delete state.log[date];
+    }
+  }
+  saveState();
+}
+
+// ---------- Render ----------
+function renderHeader() {
+  document.getElementById('today-date').textContent =
+    new Date().toLocaleDateString('ja-JP',
+      { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+}
+
+function renderToday() {
+  const container = document.getElementById('today-list');
+  container.replaceChildren();
+  const t = today();
+
+  if (state.items.length === 0) {
+    const e = document.createElement('div');
+    e.className = 'empty';
+    e.textContent = '下の「項目を編集」から項目を追加してください。';
+    container.appendChild(e);
+    return;
+  }
+
+  state.items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'today-row';
+
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = item.name;
+    row.appendChild(name);
+
+    const slots = document.createElement('div');
+    slots.className = 'slots';
+    item.slots.forEach(slotKey => {
+      const info = SLOTS.find(s => s.key === slotKey);
+      if (!info) return;
+      const btn = document.createElement('button');
+      btn.className = 'slot-btn';
+      if (info.wildcard) btn.classList.add('wildcard');
+      btn.textContent = info.label;
+      const done = isDone(t, item.id, slotKey);
+      if (done) btn.classList.add('done');
+      btn.setAttribute('aria-pressed', String(done));
+      btn.setAttribute('aria-label', `${item.name} ${info.label} ${done ? '済' : '未'}`);
+      btn.addEventListener('click', () => {
+        setDone(t, item.id, slotKey, !done);
+        render();
+      });
+      slots.appendChild(btn);
+    });
+    row.appendChild(slots);
+    container.appendChild(row);
+  });
+}
+
+function renderDays() {
+  const container = document.getElementById('days-grid');
+  container.replaceChildren();
+  if (state.items.length === 0) return;
+
+  const dates = [];
+  for (let i = -(LOG_KEEP_DAYS - 1); i <= 0; i++) dates.push(dateOffset(i));
+  const t = today();
+
+  const header = document.createElement('div');
+  header.className = 'days-header';
+  header.appendChild(document.createElement('div'));
+  dates.forEach(d => {
+    const cell = document.createElement('div');
+    const ds = dateStr(d);
+    if (ds === t) {
+      cell.textContent = '今日';
+      cell.classList.add('today-col');
+    } else {
+      cell.textContent = `${d.getMonth() + 1}/${d.getDate()}\n(${DAY_JP[d.getDay()]})`;
+    }
+    header.appendChild(cell);
+  });
+  container.appendChild(header);
+
+  state.items.forEach(item => {
+    item.slots.forEach(slotKey => {
+      const info = SLOTS.find(s => s.key === slotKey);
+      if (!info) return;
+      const row = document.createElement('div');
+      row.className = 'days-row';
+
+      const label = document.createElement('div');
+      label.className = 'row-label';
+      label.textContent = `${item.name}・${info.label}`;
+      label.title = `${item.name}・${info.label}`;
+      label.addEventListener('click', () => {
+        label.classList.toggle('expanded');
+      });
+      row.appendChild(label);
+
+      dates.forEach(d => {
+        const ds = dateStr(d);
+        const cell = document.createElement('button');
+        cell.className = 'days-cell';
+        const done = isDone(ds, item.id, slotKey);
+        if (done) cell.classList.add('done');
+        if (ds === t) cell.classList.add('today-col');
+        cell.setAttribute('aria-label', `${ds} ${item.name} ${info.label} ${done ? '済' : '未'}`);
+        cell.addEventListener('click', () => {
+          setDone(ds, item.id, slotKey, !done);
+          render();
+        });
+        row.appendChild(cell);
+      });
+      container.appendChild(row);
+    });
+  });
+}
+
+function renderEditor() {
+  const container = document.getElementById('items-editor');
+  container.replaceChildren();
+
+  state.items.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item-edit-row';
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = item.name;
+    nameInput.placeholder = '項目名';
+    nameInput.addEventListener('change', () => {
+      item.name = nameInput.value.trim() || '無題';
+      saveState();
+      render();
+    });
+    row.appendChild(nameInput);
+
+    const toggles = document.createElement('div');
+    toggles.className = 'slot-toggles';
+    SLOTS.forEach(slot => {
+      const tog = document.createElement('button');
+      tog.className = 'slot-toggle';
+      if (slot.wildcard) tog.classList.add('wildcard');
+      tog.textContent = slot.label;
+      if (item.slots.includes(slot.key)) tog.classList.add('active');
+      tog.addEventListener('click', () => {
+        const has = item.slots.includes(slot.key);
+        let next;
+        if (has) {
+          next = item.slots.filter(s => s !== slot.key);
+        } else {
+          next = SLOTS.map(s => s.key)
+            .filter(k => item.slots.includes(k) || k === slot.key);
+        }
+        if (next.length === 0) {
+          alert('時間帯は最低1つ必要です');
+          return;
+        }
+        item.slots = next;
+        saveState();
+        render();
+      });
+      toggles.appendChild(tog);
+    });
+    row.appendChild(toggles);
+
+    const del = document.createElement('button');
+    del.className = 'btn btn-danger';
+    del.textContent = '削除';
+    del.addEventListener('click', () => {
+      if (!confirm(`「${item.name}」を削除しますか？\n（履歴も削除されます）`)) return;
+      state.items.splice(idx, 1);
+      Object.keys(state.log).forEach(date => {
+        if (state.log[date][item.id]) delete state.log[date][item.id];
+        if (Object.keys(state.log[date]).length === 0) delete state.log[date];
+      });
+      saveState();
+      render();
+    });
+    row.appendChild(del);
+
+    container.appendChild(row);
+  });
+}
+
+function render() {
+  renderHeader();
+  renderToday();
+  renderDays();
+  renderEditor();
+}
+
+// ---------- Buttons ----------
+document.getElementById('add-item-btn').addEventListener('click', () => {
+  if (state.items.length >= 100) {
+    alert('項目は最大100個までです');
+    return;
+  }
+  state.items.push({ id: genId(), name: '新しい項目', slots: ['other'] });
+  saveState();
+  render();
+});
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  const exportData = {
+    items: state.items.map(item => ({ name: item.name, slots: item.slots.slice() })),
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `checklist-${today()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('import-btn').addEventListener('click', () => {
+  document.getElementById('import-file').click();
+});
+document.getElementById('import-file').addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || !Array.isArray(data.items)) throw new Error('items 配列が見つかりません');
+      if (data.items.length > 100) throw new Error('項目数が多すぎます（最大100個まで）');
+      if (data.items.some(item => typeof item.name !== 'string' || item.name.length > 100)) {
+        throw new Error('項目名が不正または長すぎます（100文字以内）');
+      }
+      if (!confirm('現在のデータを上書きします。よろしいですか？')) return;
+      state = {
+        items: data.items.map(item => ({
+          id: genId(),
+          name: String(item.name || '無題'),
+          slots: Array.isArray(item.slots) && item.slots.length > 0 ? item.slots : ['other'],
+        })),
+        log: {},
+      };
+      saveState();
+      render();
+    } catch (err) {
+      alert('読み込み失敗: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (!confirm('すべての項目とチェック履歴が削除されます。よろしいですか？')) return;
+  const answer = prompt('確認のため「1234」を入力してください');
+  if (answer === null) return;
+  if (answer.trim() !== '1234') {
+    alert('入力が一致しませんでした。初期化は中止されました。');
+    return;
+  }
+  state = initialState();
+  saveState();
+  render();
+  alert('初期化しました');
+});
+
+// 日付跨ぎ自動再描画 + 古いログ削除
+let lastRenderedDay = today();
+setInterval(() => {
+  const now = today();
+  if (now !== lastRenderedDay) {
+    lastRenderedDay = now;
+    pruneLog();
+    render();
+  }
+}, 60_000);
+
+pruneLog();
+render();
+</script>
+</body>
+</html>
