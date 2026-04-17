@@ -6,7 +6,10 @@ title: Misc
 
 ## Project Pages  
 - [https://hajimetwi3.github.io/misc/CyberSocial/TelephonePollPoisoning/](https://hajimetwi3.github.io/misc/CyberSocial/TelephonePollPoisoning/)  
-- [https://hajimetwi3.github.io/misc/AI/HijackingAIAgents/](https://hajimetwi3.github.io/misc/AI/HijackingAIAgents/)  
+- [https://hajimetwi3.github.io/misc/AI/HijackingAIAgents/](https://hajimetwi3.github.io/misc/AI/HijackingAIAgents/)
+
+## Tools  
+- [https://hajimetwi3.github.io/misc/tools/yatta/](https://hajimetwi3.github.io/misc/tools/yatta/)  
 
 ## Author  
   
