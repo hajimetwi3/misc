@@ -1,6 +1,6 @@
 ## Tsui Clock v1.1.0  
 
-サイバーパンク・琥珀・レッドのネオン発光が気持ちいい、7セグメントフォント対応のミニマル時計です。
+サイバーパンク・琥珀・レッドのネオン発光が気持ちいい、7セグメントフォント対応の時計です。
 
 <img width="648" height="323" alt="image" src="https://github.com/user-attachments/assets/b27bb4ed-e6dc-4e93-b4e5-3897af94195b" />
 
