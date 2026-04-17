@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1a1a1a"/>
+  <text x="256" y="268" text-anchor="middle"
+        font-family="ui-monospace, Menlo, Consolas, monospace"
+        font-size="120" font-weight="500" fill="#e0e0e0" letter-spacing="4">12:00</text>
+  <text x="256" y="360" text-anchor="middle"
+        font-family="ui-monospace, Menlo, Consolas, monospace"
+        font-size="44" font-weight="400" fill="#888" letter-spacing="2">TSUI</text>
+</svg>

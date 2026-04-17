@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="シンプルなデジタル時計。サイバーパンク / アンバー / レッドの発光テーマ対応。">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'self'; worker-src 'self'; manifest-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none';">
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tsui Clock">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<title>Tsui Clock</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tsui Clock">
+<meta property="og:description" content="シンプルなデジタル時計">
+<meta name="twitter:card" content="summary">
+</head>
+<body>
+  <main class="clock" id="clock" aria-label="現在の日時">
+    <time id="datetime" class="date" datetime=""><span class="num">----/--/--</span></time>
+    <div id="time" class="time">--:--:--</div>
+  </main>
+
+  <div class="panel" id="panel" role="group" aria-label="設定">
+    <div class="panel-row">
+      <span class="label">THEME</span>
+      <button data-k="theme" data-v="auto">Auto</button>
+      <button data-k="theme" data-v="dark">Dark</button>
+      <button data-k="theme" data-v="cyberpunk">Cyber</button>
+      <button data-k="theme" data-v="amber">Amber</button>
+      <button data-k="theme" data-v="red">Red</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">FONT</span>
+      <button data-k="font" data-v="mono">Mono</button>
+      <button data-k="font" data-v="consolas">Consolas</button>
+      <button data-k="font" data-v="seg7">7-Seg</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">SEC</span>
+      <button data-k="sec" data-v="on">On</button>
+      <button data-k="sec" data-v="off">Off</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">SIZE</span>
+      <button data-k="size" data-v="s">S</button>
+      <button data-k="size" data-v="m">M</button>
+      <button data-k="size" data-v="l">L</button>
+      <button data-k="size" data-v="xl">XL</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">WAKE</span>
+      <button data-k="wake" data-v="off">Off</button>
+      <button data-k="wake" data-v="on">On</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">INFO</span>
+      <button id="about-btn" data-k="about">About</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close" aria-label="閉じる">Close</button>
+      <h2 id="modal-title">Tsui Clock</h2>
+      <p class="modal-version">Version 1.0.0</p>
+
+      <h3>ABOUT</h3>
+      <p>現在の日時をシンプルに表示するデジタル時計です。</p>
+
+      <h3>DISCLAIMER</h3>
+      <p>本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。表示される時刻は端末のシステムクロックに依存します。ご利用は自己責任にてお願いします。</p>
+
+      <h3>LICENSE (This App)</h3>
+      <pre>MIT License
+
+Copyright (c) 2026 Hajime Tsui
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+
+	<h3>THIRD-PARTY</h3>
+	<p><strong>DSEG 7-Segment Font</strong><br>
+	Copyright (c) 2017, Keshikan (<a href="https://www.keshikan.net/fonts-e.html" target="_blank" rel="noopener noreferrer">keshikan.net</a>)<br>
+	Licensed under SIL Open Font License 1.1<br>
+	Full license text: <code>fonts/DSEG-LICENSE.txt</code></p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
