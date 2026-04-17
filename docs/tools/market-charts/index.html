@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マーケットチャート</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #222;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1350px;
+            margin: 0 auto;
+        }
+        .chart-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+        .chart-title {
+            margin: 0;
+            padding: 18px 25px 10px;
+            background: #f1f3f5;
+            font-size: 1.35em;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+        }
+        .tradingview-widget-container {
+            height: 400px;
+            width: 600px;
+            margin: 0 auto;
+        }
+        .source {
+            text-align: center;
+            font-size: 0.85em;
+            color: #666;
+            padding: 10px 15px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 0.9em;
+            color: #777;
+        }
+        @media (max-width: 1100px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>マーケットチャート（4時間足）</h1>
+
+    <div class="charts-grid">
+
+        <!-- WTI原油 -->
+        <div class="chart-box">
+            <div class="chart-title">WTI原油 (TVC:USOIL)</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "TVC:USOIL",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（TVC:USOIL）</div>
+        </div>
+
+        <!-- 金/円 -->
+        <div class="chart-box">
+            <div class="chart-title">金/円（OANDA:XAUJPY）</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "OANDA:XAUJPY",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（OANDA:XAUJPY）</div>
+        </div>
+
+        <!-- 銀/円 -->
+        <div class="chart-box">
+            <div class="chart-title">銀/円（OANDA:XAGJPY）</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "OANDA:XAGJPY",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（OANDA:XAGJPY）</div>
+        </div>
+
+        <!-- ダウ平均（CFD） -->
+        <div class="chart-box">
+            <div class="chart-title">ダウ平均 (BLACKBULL:US30)</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "BLACKBULL:US30",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（BLACKBULL:US30 ※CFD）</div>
+        </div>
+
+        <!-- S&P500（CFD） -->
+        <div class="chart-box">
+            <div class="chart-title">S&amp;P500 (CAPITALCOM:US500)</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "CAPITALCOM:US500",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（CAPITALCOM:US500 ※CFD）</div>
+        </div>
+
+        <!-- ナスダック（CFD） -->
+        <div class="chart-box">
+            <div class="chart-title">ナスダック (CAPITALCOM:US100)</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "CAPITALCOM:US100",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（CAPITALCOM:US100 ※CFD）</div>
+        </div>
+
+        <!-- 日経225先物 -->
+        <div class="chart-box">
+            <div class="chart-title">日経225先物 (OSE:NK2251!)</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 600,
+                    "height": 400,
+                    "symbol": "OSE:NK2251!",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（OSE:NK2251!）</div>
+        </div>
+
+    </div>
+
+    <footer>
+        データは参考値です（※CFD版は実際の指数とほぼ連動）
+    </footer>
+</body>
+</html>
