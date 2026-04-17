@@ -29,7 +29,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             overflow: hidden;
-            max-width: 620px;
+            max-width: 470px;     /* ← 450pxチャート＋余白 */
             margin: 0 auto;
         }
         .chart-title {
@@ -42,8 +42,8 @@
         }
         .tradingview-widget-container {
             height: 400px;
-            width: 100%;           /* ← 変更 */
-            max-width: 600px;      /* ← 追加 */
+            width: 100%;
+            max-width: 450px;     /* ← ここを450pxに縮小 */
             margin: 0 auto;
         }
         .source {
@@ -80,7 +80,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "TVC:USOIL",
                     "interval": "240",
@@ -105,7 +105,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "OANDA:XAUJPY",
                     "interval": "240",
@@ -130,7 +130,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "OANDA:XAGJPY",
                     "interval": "240",
@@ -155,7 +155,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "BLACKBULL:US30",
                     "interval": "240",
@@ -180,7 +180,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "CAPITALCOM:US500",
                     "interval": "240",
@@ -205,7 +205,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "CAPITALCOM:US100",
                     "interval": "240",
@@ -230,7 +230,7 @@
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
                 {
                     "autosize": false,
-                    "width": 600,
+                    "width": 450,
                     "height": 400,
                     "symbol": "OSE:NK2251!",
                     "interval": "240",
@@ -245,6 +245,31 @@
                 </script>
             </div>
             <div class="source">出典：TradingView（OSE:NK2251!）</div>
+        </div>
+
+        <!-- ドル円 -->
+        <div class="chart-box">
+            <div class="chart-title">ドル円（OANDA:USDJPY）</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": 450,
+                    "height": 400,
+                    "symbol": "OANDA:USDJPY",
+                    "interval": "240",
+                    "timezone": "Asia/Tokyo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ja",
+                    "allow_symbol_change": true,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+            <div class="source">出典：TradingView（OANDA:USDJPY）</div>
         </div>
 
     </div>
