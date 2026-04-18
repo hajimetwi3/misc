@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="シンプルなデジタル時計。サイバーパンク / アンバー / レッドの発光テーマ対応。">
+<meta name="description" content="ネオン発光が気持ちいい、7セグメントフォント対応のサイバーパンク風デジタル時計。PWA対応・オフライン動作可能。">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
@@ -21,7 +21,7 @@
 <title>Tsui Clock</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Tsui Clock">
-<meta property="og:description" content="シンプルなデジタル時計">
+<meta property="og:description" content="ネオン発光が気持ちいい、サイバーパンク風デジタル時計。">
 <meta name="twitter:card" content="summary">
 </head>
 <body>
@@ -35,9 +35,11 @@
       <span class="label">THEME</span>
       <button data-k="theme" data-v="auto">Auto</button>
       <button data-k="theme" data-v="dark">Dark</button>
-      <button data-k="theme" data-v="cyberpunk">Cyber</button>
+      <button data-k="theme" data-v="green">Green</button>
       <button data-k="theme" data-v="amber">Amber</button>
       <button data-k="theme" data-v="red">Red</button>
+      <button data-k="theme" data-v="pink">Pink</button>
+      <button data-k="theme" data-v="cyber">Cyber</button>
     </div>
     <div class="panel-row">
       <span class="label">FONT</span>
@@ -49,6 +51,9 @@
       <span class="label">SEC</span>
       <button data-k="sec" data-v="on">On</button>
       <button data-k="sec" data-v="off">Off</button>
+      <span class="label label-inline">DATE</span>
+      <button data-k="date" data-v="on">On</button>
+      <button data-k="date" data-v="off">Off</button>
     </div>
     <div class="panel-row">
       <span class="label">SIZE</span>
@@ -56,14 +61,26 @@
       <button data-k="size" data-v="m">M</button>
       <button data-k="size" data-v="l">L</button>
       <button data-k="size" data-v="xl">XL</button>
+      <button data-k="size" data-v="max">Max</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">FX</span>
+      <button data-k="fx" data-v="off">Off</button>
+      <button data-k="fx" data-v="on">On</button>
+      <button data-k="fx" data-v="max">Max</button>
+    </div>
+    <div class="panel-row">
+      <span class="label">BG</span>
+      <button data-k="bg" data-v="solid">Solid</button>
+      <button data-k="bg" data-v="ghost1">Ghost1</button>
+      <button data-k="bg" data-v="ghost2">Ghost2</button>
+      <button data-k="bg" data-v="ghost3">Ghost3</button>
     </div>
     <div class="panel-row">
       <span class="label">WAKE</span>
       <button data-k="wake" data-v="off">Off</button>
       <button data-k="wake" data-v="on">On</button>
-    </div>
-    <div class="panel-row">
-      <span class="label">INFO</span>
+      <span class="label label-inline">INFO</span>
       <button id="about-btn" data-k="about">About</button>
     </div>
   </div>
@@ -72,12 +89,12 @@
     <div class="modal" id="modal">
       <button class="modal-close" id="modal-close" aria-label="閉じる">Close</button>
       <h2 id="modal-title">Tsui Clock</h2>
-      <p class="modal-version">Version 1.1.0</p>
+      <p class="modal-version">Version 1.2.0</p>
 
 
       <h3>ABOUT</h3>
       <p>現在の日時をシンプルに表示するデジタル時計です。</p>
-	  <p style="color: var(--sub); font-size: 11px;">
+	  <p class="modal-hint">
          時計をシングルタップで設定パネル、ダブルタップで全画面表示。<br>
 		 --<a href="https://github.com/hajimetwi3/misc/blob/main/docs/tools/tsui-clock/readme.md" target="_blank" rel="noopener noreferrer">詳細</a>--
       </p>
