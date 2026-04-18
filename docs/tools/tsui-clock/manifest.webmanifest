@@ -1,7 +1,7 @@
 {
   "name": "Tsui Clock",
   "short_name": "Tsui Clock",
-  "description": "シンプルなデジタル時計。サイバーパンク / アンバー / レッドの発光テーマ対応。",
+  "description": "ネオン発光が気持ちいい、7セグメントフォント対応のサイバーパンク風デジタル時計。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
