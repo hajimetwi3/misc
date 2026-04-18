@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'tsui-clock-v1.1.0';
+const CACHE = 'tsui-clock-v1.2.0';
 const ASSETS = [
   './',
   './index.html',
