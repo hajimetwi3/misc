@@ -36,10 +36,10 @@
 
 ## スクリーンショット  
 
-<img width="480" alt="image" src="./images/red1.jpg" />  
-<img width="480" alt="image" src="./images/amber1.jpg" />  
+<img width="480" alt="image" src="./images/red2.1.jpg" />  
+<img width="480" alt="image" src="./images/cyber1.1.jpg" />  
 <img width="480" alt="image" src="./images/setting1.jpg" />  
-<img width="480" alt="image" src="./images/consolas1.jpg" />  
+<img width="480" alt="image" src="./images/pink1.1.jpg" />  
 
 ## Changelog  
 ### v1.0.0  
