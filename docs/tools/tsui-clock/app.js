@@ -56,13 +56,16 @@
 
   // 設定管理
   const STORAGE_KEY = 'clock.settings.v1';
-  const defaults = { theme: 'cyberpunk', font: 'seg7', size: 'm', wake: 'off', sec: 'off' };
+  const defaults = { theme: 'green', font: 'seg7', size: 'm', wake: 'off', sec: 'off', fx: 'on', date: 'on', bg: 'solid' };
   const allowed = {
-    theme: ['auto','dark','cyberpunk','amber','red'],
+    theme: ['auto','dark','green','amber','red','pink','cyber'],
     font:  ['mono','consolas','seg7'],
-    size:  ['s','m','l','xl'],
+    size:  ['s','m','l','xl','max'],
     wake:  ['off','on'],
-    sec:   ['on','off']
+    sec:   ['on','off'],
+    fx:    ['off','on','max'],
+    date:  ['on','off'],
+    bg:    ['solid','ghost1','ghost2','ghost3']
   };
   let settings = { ...defaults };
 
@@ -85,6 +88,9 @@
     root.setAttribute('data-font', settings.font);
     root.setAttribute('data-size', settings.size);
     root.setAttribute('data-sec', settings.sec);  // ← 追加
+    root.setAttribute('data-fx', settings.fx);
+    root.setAttribute('data-date', settings.date);
+    root.setAttribute('data-bg', settings.bg);
     panel.querySelectorAll('button[data-k]').forEach(b => {
       if (b.dataset.k === 'about') return;
       b.setAttribute('aria-pressed',
