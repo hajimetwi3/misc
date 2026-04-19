@@ -1,6 +1,10 @@
 ## Tsui editor  
 ブラウザでローカルファイルを編集するシンプルなエディタ。ログイン不要、データの外部送信無し。  
 
+## スクリーンショット  
+
+<img width="480" alt="image" src="./images/tsui1.1.jpg" />  
+
 ## 使い方
 
 1. https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html をブラウザから直接開く  
