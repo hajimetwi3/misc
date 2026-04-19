@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1a1a1a">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none';">
+<title>Tsui editor</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1a1a1a;
+    --bg-elevated: #222;
+    --bg-hover: #2a2a2a;
+    --bg-active: #333;
+    --fg: #e4e4e4;
+    --fg-dim: #888;
+    --fg-faint: #555;
+    --accent: #7dd3c0;
+    --border: #2a2a2a;
+    --modified: #e8b842;
+    --danger: #e57373;
+    --tree-font-size: 12.5px;
+    --ui-font-delta: 0px;  /* Tree S=0px, M=+2px, L=+4px */
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    height: 100vh;        /* フォールバック（超旧ブラウザ用） */
+    height: 100dvh;       /* モバイルブラウザのUI表示/非表示に追従 */
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: calc(12px + var(--ui-font-delta));
+    background: var(--bg-elevated);
+    min-width: 0;
+  }
+  header button {
+    padding: calc(5px + var(--ui-font-delta) / 2) calc(12px + var(--ui-font-delta));
+    font-size: calc(12px + var(--ui-font-delta));
+  }
+  header .folder-path { font-size: calc(12px + var(--ui-font-delta)); }
+
+  .title { font-weight: 600; letter-spacing: 1px; font-size: 12px; color: var(--accent); flex-shrink: 0; }
+
+  .folder-path {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    color: var(--fg-dim);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  button:hover:not(:disabled) { background: var(--bg-hover); border-color: var(--accent); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover:not(:disabled) { background: #9ae0d0; }
+  button.reconnect { border-color: var(--modified); color: var(--modified); max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+  button.reconnect:hover { background: rgba(232, 184, 66, 0.1); }
+
+  .sidebar-toggle {
+    padding: 4px 9px;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--fg-dim);
+  }
+  .sidebar-toggle:hover { color: var(--accent); }
+
+  main {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    overflow: hidden;
+    position: relative;
+  }
+
+  body.sidebar-hidden main { grid-template-columns: 1fr; }
+  body.sidebar-hidden #sidebar { display: none; }
+
+  #sidebar-backdrop {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 99;
+  }
+
+  #sidebar {
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .sidebar-toolbar {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    padding: 3px 8px;
+    font-size: calc(11px + var(--ui-font-delta));
+    color: var(--fg-dim);
+    border-color: transparent;
+  }
+  .icon-btn:hover:not(:disabled) {
+    color: var(--fg);
+    background: var(--bg-hover);
+    border-color: var(--border);
+  }
+
+  #tree-container {
+    flex: 1;
+    overflow: auto;
+    padding: 6px 0;
+    position: relative;
+  }
+
+  /* ==== Sidebar settings ==== */
+  .sidebar-settings {
+    border-top: 1px solid var(--border);
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+  }
+  .settings-label {
+    font-size: calc(9.5px + var(--ui-font-delta));
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--fg-faint);
+    text-transform: uppercase;
+  }
+  .font-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg);
+    border-color: var(--border);
+    background: transparent;
+  }
+  .font-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .font-btn:disabled {
+    opacity: 0.3;
+  }
+  #font-size-display {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    min-width: 36px;
+    text-align: center;
+    color: var(--fg);
+  }
+  .settings-reset {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--fg-faint);
+    cursor: pointer;
+    user-select: none;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+  .settings-reset:hover { color: var(--fg-dim); background: var(--bg-hover); }
+
+  .sidebar-settings + .sidebar-settings {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .tree-size-btn {
+    width: 30px;
+    height: 24px;
+    padding: 0;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg-dim);
+    border: 1px solid var(--border);
+    background: transparent;
+    letter-spacing: 0.5px;
+  }
+  .tree-size-btn:hover:not(.active) {
+    background: var(--bg-hover);
+    color: var(--fg);
+    border-color: var(--accent);
+  }
+  .tree-size-btn.active {
+    background: var(--accent);
+    color: #111;
+    border-color: var(--accent);
+  }
+
+  .about-row {
+    border-top: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 10.5px;
+    color: var(--fg-faint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+  }
+  .about-link {
+    cursor: pointer;
+    user-select: none;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--fg-dim);
+  }
+  .about-link:hover { color: var(--accent); background: var(--bg-hover); }
+  .about-version {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+  }
+
+  .readonly-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--modified);
+    border: 1px solid var(--modified);
+    border-radius: 3px;
+    margin-left: 8px;
+  }
+
+  /* ==== Tree ==== */
+  .tree-node {
+    padding: 3px 4px 3px 0;
+    cursor: pointer;
+    user-select: none;
+    font-size: var(--tree-font-size);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .tree-node:hover { background: var(--bg-hover); }
+  .tree-node.active { background: var(--bg-active); color: var(--accent); }
+  .tree-node.open-in-tab { color: var(--fg); }
+
+  .tree-icon {
+    display: inline-block;
+    width: 14px;
+    margin-right: 4px;
+    color: var(--fg-faint);
+    font-size: 0.8em;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .tree-label { overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+
+  /* 右端の⋮メニューボタン（デスクトップではホバー時のみ表示） */
+  .tree-menu-btn {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    margin-left: 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--fg-dim);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.1s, background 0.1s, border-color 0.1s;
+  }
+  .tree-node:hover .tree-menu-btn,
+  .tree-menu-btn:focus { opacity: 1; }
+  .tree-menu-btn:hover {
+    background: var(--bg-active);
+    border-color: var(--border);
+    color: var(--fg);
+  }
+
+  .tree-edit-input {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: var(--fg);
+    padding: 1px 4px;
+    font-size: var(--tree-font-size);
+    font-family: inherit;
+    outline: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tree-node-actions {
+    display: none;
+    gap: 0;
+    flex-shrink: 0;
+    padding-left: 4px;
+  }
+  .tree-node:hover .tree-node-actions { display: flex; }
+  body.dragging .tree-node-actions { display: none !important; }
+
+  .tree-action-btn {
+    width: 22px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-size: 10px;
+    color: var(--fg-dim);
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: -0.5px;
+  }
+  .tree-action-btn:hover { background: var(--bg-active); color: var(--accent); }
+
+  .tree-node.drop-target {
+    background: rgba(125, 211, 192, 0.18) !important;
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  #tree-container.drop-target-root {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  /* ==== Editor area ==== */
+  #editor-area { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .tab-bar {
+    display: flex;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    min-height: 33px;
+    scrollbar-width: thin;
+    flex-shrink: 0;
+  }
+  .tab-bar:empty { display: none; }
+  .tab-bar::-webkit-scrollbar { height: 4px; }
+  .tab-bar::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px 0 12px;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    font-size: calc(12px + var(--ui-font-delta));
+    color: var(--fg-dim);
+    white-space: nowrap;
+    user-select: none;
+    flex-shrink: 0;
+    height: calc(32px + var(--ui-font-delta) * 1.5);
+    max-width: 220px;
+  }
+  .tab:hover { background: var(--bg-hover); color: var(--fg); }
+  .tab.active { background: var(--bg); color: var(--fg); }
+
+  .tab-name { overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+  .tab-modified { color: var(--modified); font-size: 10px; line-height: 1; }
+
+  .tab-close {
+    width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 3px;
+    font-size: 14px;
+    color: var(--fg-faint);
+    margin-left: 2px;
+  }
+  .tab-close:hover { background: var(--bg-active); color: var(--fg); }
+
+  .editor-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+  }
+
+  #editor {
+    flex: 1;
+    background: var(--bg);
+    color: var(--fg);
+    border: none;
+    padding: 14px 18px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    line-height: 1.65;
+    resize: none;
+    outline: none;
+    tab-size: 2;
+    white-space: pre;
+  }
+  #editor:disabled { color: var(--fg-faint); }
+
+  .editor-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--fg-faint);
+    font-size: 13px;
+    pointer-events: none;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.8;
+    background: var(--bg);
+  }
+  .editor-empty .title-large {
+    font-size: 15px;
+    color: var(--fg-dim);
+    letter-spacing: 0.5px;
+  }
+  .editor-empty .hint {
+    font-size: 11.5px;
+    color: var(--fg-faint);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  footer {
+    padding: 5px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-elevated);
+    font-size: calc(11px + var(--ui-font-delta));
+    color: var(--fg-dim);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    overflow: hidden;
+  }
+  #status-info { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .footer-hint { white-space: nowrap; flex-shrink: 0; }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--fg-faint);
+    font-size: 12px;
+    padding: 20px;
+    text-align: center;
+    line-height: 1.9;
+  }
+
+  .kbd {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: var(--bg-active);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10.5px;
+    border: 1px solid var(--border);
+  }
+
+  .unsupported { max-width: 480px; text-align: center; line-height: 1.8; margin: 80px auto; padding: 20px; }
+  .unsupported h2 { color: var(--modified); margin-bottom: 12px; font-size: 16px; }
+  .unsupported p { color: var(--fg-dim); font-size: 13px; }
+
+  .context-menu {
+    position: fixed;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px;
+    min-width: 160px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: none;
+  }
+  .context-item {
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--fg);
+    user-select: none;
+  }
+  .context-item:hover { background: var(--bg-hover); }
+  .context-item.danger { color: var(--danger); }
+  .context-item.danger:hover { background: rgba(229, 115, 115, 0.12); }
+  .context-separator { height: 1px; background: var(--border); margin: 4px 2px; }
+
+  /* ==== Footer indicators ==== */
+  .footer-pill {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: calc(10.5px + var(--ui-font-delta));
+    padding: 1px 7px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    color: var(--fg-dim);
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .footer-pill:hover { color: var(--fg); border-color: var(--accent); }
+  .footer-pill.readonly { color: var(--modified); border-color: var(--modified); }
+
+  /* ==== About button in sidebar ==== */
+  .sidebar-about {
+    border-top: 1px solid var(--border);
+    padding: 7px 10px;
+    font-size: calc(10.5px + var(--ui-font-delta));
+    color: var(--fg-faint);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: var(--bg-elevated);
+  }
+  .sidebar-about:hover { color: var(--accent); background: var(--bg-hover); }
+
+  /* ==== Modal (About dialog) ==== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  }
+  .modal-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+  .modal-close {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--fg-dim);
+    border-color: transparent;
+  }
+  .modal-close:hover { color: var(--fg); background: var(--bg-hover); }
+  .modal-body {
+    padding: 20px 24px 24px;
+    overflow-y: auto;
+    color: var(--fg);
+    font-size: 12.5px;
+    line-height: 1.75;
+  }
+  .modal-body h3 {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin: 18px 0 6px;
+  }
+  .modal-body h3:first-child { margin-top: 0; }
+  .modal-body p { color: var(--fg-dim); margin-bottom: 2px; }
+  .modal-body .version-line {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--fg-faint);
+    margin-bottom: 16px;
+  }
+  .modal-body .app-name {
+    font-size: 16px;
+    color: var(--fg);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .modal-body .license-text {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .modal-body .author-line {
+    font-size: 11px;
+    color: var(--fg-dim);
+    margin-bottom: 8px;
+  }
+  .modal-body a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .modal-body a:hover { text-decoration: underline; }
+
+  /* ==== Mobile ==== */
+  @media (max-width: 768px) {
+    /* ヘッダー: タップ標的 min-height 44px、ボタン間隔を広めに */
+    header { padding: 8px 10px; gap: calc(10px + var(--ui-font-delta)); }
+    .title { display: none; }
+    header button {
+      padding: calc(9px + var(--ui-font-delta) / 2) calc(14px + var(--ui-font-delta));
+      font-size: calc(13px + var(--ui-font-delta));
+      min-height: 40px;
+    }
+    #btn-reconnect { max-width: 130px; }
+    header .folder-path { font-size: calc(11px + var(--ui-font-delta)); }
+
+    main { grid-template-columns: 1fr; }
+
+    #sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 80%;
+      max-width: 320px;
+      z-index: 100;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    }
+
+    body:not(.sidebar-hidden) #sidebar-backdrop { display: block; }
+
+    footer { padding: 5px 10px; font-size: calc(10px + var(--ui-font-delta)); gap: 8px; }
+    .footer-hint { display: none; }
+
+    .tree-node-actions { display: flex; }
+    .tree-action-btn { width: 26px; height: 22px; font-size: calc(11px + var(--ui-font-delta)); }
+
+    /* モバイルでは⋮を常時表示（タップ標的を明示） */
+    .tree-menu-btn { opacity: 1; width: 32px; height: 32px; font-size: calc(18px + var(--ui-font-delta)); }
+
+    /* モバイルブラウザのURLバー／ナビバー／ホームインジケータで下端が
+       隠れないよう、ABOUT とフッターに安全余白を足す */
+    .sidebar-about {
+      padding-bottom: calc(7px + 3em + env(safe-area-inset-bottom, 0px));
+    }
+    footer {
+      padding-bottom: calc(5px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
+  /* ==== Folder warning modal ================================================ */
+  .warn-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10000; padding: 20px;
+  }
+  .warn-modal {
+    background: var(--bg-elevated); border: 1px solid var(--danger);
+    border-radius: 8px; padding: 24px; max-width: 520px; width: 100%;
+    color: var(--fg); font-size: 13px; line-height: 1.7;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  .warn-modal h2 {
+    color: var(--danger); font-size: 15px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .warn-modal p { margin: 6px 0; }
+  .warn-modal ul { margin: 8px 0 12px 20px; color: var(--fg-dim); }
+  .warn-modal li { margin: 2px 0; }
+  .warn-modal code {
+    background: var(--bg); padding: 1px 6px; border-radius: 3px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px;
+    color: var(--accent);
+  }
+  .warn-modal .warn-note {
+    color: var(--fg-dim); font-size: 12px; margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+  .warn-modal .warn-actions {
+    display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <button id="btn-toggle-sidebar" class="sidebar-toggle" title="サイドバーの表示切替 (Ctrl+B)">☰</button>
+  <span class="title">TSUI EDITOR</span>
+  <span class="folder-path" id="folder-path">フォルダ未選択</span>
+  <button id="btn-reconnect" class="reconnect" style="display:none"></button>
+  <button id="btn-open" title="⚠ 選択したフォルダ配下に読み書き権限を持ちます。専用の作業フォルダを推奨します。">フォルダを開く</button>
+  <button id="btn-save" class="primary" disabled>保存</button>
+</header>
+<main>
+  <div id="sidebar-backdrop"></div>
+  <aside id="sidebar">
+    <div class="sidebar-toolbar" id="sidebar-toolbar" style="display:none">
+      <button class="icon-btn" id="btn-new-file" title="新規ファイル (Ctrl+N)">＋ File</button>
+      <button class="icon-btn" id="btn-new-folder" title="新規フォルダ">＋ Folder</button>
+      <button class="icon-btn" id="btn-refresh" title="更新">⟳</button>
+    </div>
+    <div id="tree-container">
+      <div class="empty-state" id="sidebar-empty">
+        「フォルダを開く」を押して<br>作業フォルダを選択してください
+      </div>
+    </div>
+    <div class="sidebar-settings">
+      <span class="settings-label">Font</span>
+      <button class="font-btn" id="btn-font-dec" title="フォント縮小">−</button>
+      <span id="font-size-display">13px</span>
+      <button class="font-btn" id="btn-font-inc" title="フォント拡大">＋</button>
+      <span class="settings-reset" id="btn-font-reset" title="リセット">reset</span>
+    </div>
+    <div class="sidebar-settings">
+      <span class="settings-label">Sys Font</span>
+      <button class="tree-size-btn" data-size="s" title="小 (12.5px)">S</button>
+      <button class="tree-size-btn" data-size="m" title="中 (17.5px)">M</button>
+      <button class="tree-size-btn" data-size="l" title="大 (20px)">L</button>
+    </div>
+    <div class="sidebar-about" id="btn-about" title="このアプリについて">
+      <span>ABOUT</span>
+      <span>v0.5.0</span>
+    </div>
+  </aside>
+  <section id="editor-area">
+    <div class="tab-bar" id="tab-bar"></div>
+    <div class="editor-wrap">
+      <textarea id="editor" disabled spellcheck="false"></textarea>
+      <div class="editor-empty" id="editor-empty">
+        <div class="title-large">ファイルが選択されていません</div>
+        <div class="hint">
+          左のファイルツリーからファイルを選択<br>
+          もしくは「フォルダを開く」で作業を開始
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <span id="status-info"></span>
+  <span class="footer-pill" id="pill-readonly" style="display:none">READONLY</span>
+  <span class="footer-pill" id="pill-encoding" style="display:none" title="文字エンコーディング (クリックで変更)">UTF-8</span>
+  <span class="footer-pill" id="pill-eol" style="display:none" title="改行コード (クリックで変換)">LF</span>
+  <span class="footer-hint">保存 <span class="kbd">Ctrl</span>+<span class="kbd">S</span> · タブ閉 <span class="kbd">Ctrl</span>+<span class="kbd">W</span> · サイドバー <span class="kbd">Ctrl</span>+<span class="kbd">B</span></span>
+</footer>
+<div class="context-menu" id="context-menu"></div>
+
+<!-- About Modal -->
+<div class="modal-backdrop" id="modal-about">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">About</span>
+      <button class="modal-close" id="btn-modal-close" title="閉じる">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="app-name">Tsui Editor</div>
+      <div class="version-line">Version 0.5.0</div>
+
+      <h3>About</h3>
+      <p>シンプルなエディタ。ログイン不要、データの外部送信無し。<br>
+        — <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">詳細</a> —</p>
+
+      <h3>Disclaimer</h3>
+      <p>本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。ご利用は自己責任にてお願いします。</p>
+
+      <h3>License (This App)</h3>
+      <div class="author-line">Copyright (c) 2026 <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener noreferrer">Hajime Tsui</a></div>
+      <div class="license-text">MIT License
+
+Copyright (c) 2026 Hajime Tsui
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==== Browser support check =================================================
+if (!('showDirectoryPicker' in window)) {
+  document.body.innerHTML = `
+    <div class="unsupported">
+      <h2>このブラウザは非対応です</h2>
+      <p>File System Access API が必要です。<br>
+      <b>Chrome / Edge / Opera</b> などの Chromium 系ブラウザでお試しください。<br>
+      (Firefox / Safari は現状未対応)</p>
+    </div>`;
+  throw new Error('Unsupported');
+}
+
+// ==== IndexedDB =============================================================
+const DB_NAME = 'tsui-editor';
+const STORE = 'handles';
+const KEY_LAST = 'lastFolder';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(STORE);
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+async function idbPut(key, value) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+async function idbGet(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).get(key);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+// ==== State =================================================================
+let rootHandle = null;
+const expandedPaths = new Set();
+let tabs = [];  // {path, handle, content, originalContent, scrollTop, selStart, selEnd, encoding, eol, readonly, hasBom}
+let activeTabIndex = -1;
+let dragState = null;
+
+// ==== File size thresholds ==================================================
+const SIZE_WARN = 10 * 1024 * 1024;      // 10MB: 警告
+const SIZE_READONLY = 30 * 1024 * 1024;  // 30MB: readonly強制
+const SIZE_REJECT = 50 * 1024 * 1024;    // 50MB: 開くのを拒否
+
+// ==== Encoding detection ====================================================
+// BOMパターン
+const BOM_UTF8  = [0xEF, 0xBB, 0xBF];
+const BOM_UTF16LE = [0xFF, 0xFE];
+const BOM_UTF16BE = [0xFE, 0xFF];
+
+function startsWith(bytes, prefix) {
+  if (bytes.length < prefix.length) return false;
+  for (let i = 0; i < prefix.length; i++) if (bytes[i] !== prefix[i]) return false;
+  return true;
+}
+
+/**
+ * ArrayBuffer からテキストへ復号。文字コードを自動判定する。
+ * @returns {{ text: string, encoding: string, hasBom: boolean }}
+ */
+function decodeBytes(arrayBuffer) {
+  const bytes = new Uint8Array(arrayBuffer);
+
+  // BOM判定
+  if (startsWith(bytes, BOM_UTF8)) {
+    const view = bytes.subarray(3);
+    return { text: new TextDecoder('utf-8').decode(view), encoding: 'UTF-8', hasBom: true };
+  }
+  if (startsWith(bytes, BOM_UTF16LE)) {
+    const view = bytes.subarray(2);
+    return { text: new TextDecoder('utf-16le').decode(view), encoding: 'UTF-16LE', hasBom: true };
+  }
+  if (startsWith(bytes, BOM_UTF16BE)) {
+    const view = bytes.subarray(2);
+    return { text: new TextDecoder('utf-16be').decode(view), encoding: 'UTF-16BE', hasBom: true };
+  }
+
+  // UTF-8 を fatal で試す → 失敗なら Shift_JIS を試す
+  try {
+    const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    return { text, encoding: 'UTF-8', hasBom: false };
+  } catch {
+    // UTF-8として不正 → 日本語圏では Shift_JIS が最頻出
+    try {
+      const text = new TextDecoder('shift_jis', { fatal: true }).decode(bytes);
+      return { text, encoding: 'Shift_JIS', hasBom: false };
+    } catch {
+      // さらにフォールバック: EUC-JP
+      try {
+        const text = new TextDecoder('euc-jp', { fatal: true }).decode(bytes);
+        return { text, encoding: 'EUC-JP', hasBom: false };
+      } catch {
+        // 最後は UTF-8 non-fatal で文字化け覚悟の復号
+        const text = new TextDecoder('utf-8').decode(bytes);
+        return { text, encoding: 'UTF-8?', hasBom: false };
+      }
+    }
+  }
+}
+
+/**
+ * 改行コードを判定する。
+ * @returns {'CRLF' | 'CR' | 'LF'}
+ */
+function detectEol(text) {
+  // サンプリング: 先頭64KB程度で十分
+  const sample = text.length > 65536 ? text.slice(0, 65536) : text;
+  let lf = 0, crlf = 0, cr = 0;
+  for (let i = 0; i < sample.length; i++) {
+    const c = sample.charCodeAt(i);
+    if (c === 0x0D) {
+      if (sample.charCodeAt(i + 1) === 0x0A) { crlf++; i++; }
+      else cr++;
+    } else if (c === 0x0A) {
+      lf++;
+    }
+  }
+  if (crlf >= lf && crlf >= cr) return crlf > 0 ? 'CRLF' : 'LF';
+  if (cr > lf) return 'CR';
+  return 'LF';
+}
+
+/**
+ * 保存用にエンコード。元のBOM・改行コードを尊重する。
+ * 文字コードは UTF-8 / UTF-16LE / UTF-16BE のみサポート
+ * (ブラウザの TextEncoder は UTF-8 固定で、他の TextEncoder 実装は標準に無い)。
+ * それ以外の encoding (Shift_JIS, EUC-JP 等) が渡された場合は UTF-8 にフォールバック。
+ * @returns {{ bytes: Uint8Array, fallback: boolean, actualEncoding: string }}
+ */
+function encodeForSave(text, meta) {
+  // 改行コードをエディタ内部の \n から元の形式へ戻す
+  let normalized = text;
+  if (meta.eol === 'CRLF') {
+    normalized = text.replace(/\r?\n/g, '\r\n');
+  } else if (meta.eol === 'CR') {
+    normalized = text.replace(/\r?\n/g, '\r');
+  }
+
+  const enc = meta.encoding;
+  // UTF-16LE / UTF-16BE は手動エンコード
+  if (enc === 'UTF-16LE' || enc === 'UTF-16BE') {
+    const le = (enc === 'UTF-16LE');
+    // BOM (2バイト) + 各文字2バイト。サロゲートペアは2コードユニット扱い。
+    const len = normalized.length;
+    const out = new Uint8Array((meta.hasBom ? 2 : 0) + len * 2);
+    let p = 0;
+    if (meta.hasBom) {
+      if (le) { out[0] = 0xFF; out[1] = 0xFE; }
+      else    { out[0] = 0xFE; out[1] = 0xFF; }
+      p = 2;
+    }
+    for (let i = 0; i < len; i++) {
+      const c = normalized.charCodeAt(i);
+      if (le) { out[p++] = c & 0xFF; out[p++] = (c >> 8) & 0xFF; }
+      else    { out[p++] = (c >> 8) & 0xFF; out[p++] = c & 0xFF; }
+    }
+    return { bytes: out, fallback: false, actualEncoding: enc };
+  }
+
+  // UTF-8 (またはそれ以外は UTF-8 にフォールバック)
+  const encoder = new TextEncoder(); // UTF-8 固定
+  const body = encoder.encode(normalized);
+  const isUtf8 = (enc === 'UTF-8' || enc === 'UTF-8?');
+  const fallback = !isUtf8;
+
+  // BOM付与は UTF-8 で hasBom=true の時のみ
+  if (isUtf8 && meta.hasBom) {
+    const out = new Uint8Array(body.length + 3);
+    out.set(BOM_UTF8, 0);
+    out.set(body, 3);
+    return { bytes: out, fallback: false, actualEncoding: 'UTF-8' };
+  }
+  return { bytes: body, fallback, actualEncoding: 'UTF-8' };
+}
+
+// ==== Font size =============================================================
+const FONT_KEY = 'tsui-editor-font-size';
+const DEFAULT_FONT = 13;
+const MIN_FONT = 9;
+const MAX_FONT = 32;
+let fontSize = (() => {
+  const v = parseInt(localStorage.getItem(FONT_KEY), 10);
+  return (isFinite(v) && v >= MIN_FONT && v <= MAX_FONT) ? v : DEFAULT_FONT;
+})();
+
+// ==== Tree font size ========================================================
+const TREE_SIZES = { s: 12.5, m: 17.5, l: 20 };
+const UI_FONT_DELTAS = { s: 0, m: 2, l: 4 };  // システム文字の加算px（S基準）
+const TREE_SIZE_KEY = 'tsui-editor-tree-size';
+let treeSize = (() => {
+  const v = localStorage.getItem(TREE_SIZE_KEY);
+  return (v === 's' || v === 'm' || v === 'l') ? v : 's';
+})();
+
+// ==== Mobile / Sidebar ======================================================
+const MOBILE_BP = 768;
+const isMobile = () => window.innerWidth <= MOBILE_BP;
+function setSidebarVisible(visible) {
+  document.body.classList.toggle('sidebar-hidden', !visible);
+}
+
+// ==== Elements ==============================================================
+const $path = document.getElementById('folder-path');
+const $sidebarEmpty = document.getElementById('sidebar-empty');
+const $sidebarToolbar = document.getElementById('sidebar-toolbar');
+const $sidebarBackdrop = document.getElementById('sidebar-backdrop');
+const $tree = document.getElementById('tree-container');
+const $tabBar = document.getElementById('tab-bar');
+const $editor = document.getElementById('editor');
+const $editorEmpty = document.getElementById('editor-empty');
+const $btnOpen = document.getElementById('btn-open');
+const $btnSave = document.getElementById('btn-save');
+const $btnReconnect = document.getElementById('btn-reconnect');
+const $btnNewFile = document.getElementById('btn-new-file');
+const $btnNewFolder = document.getElementById('btn-new-folder');
+const $btnRefresh = document.getElementById('btn-refresh');
+const $btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+const $statusInfo = document.getElementById('status-info');
+const $ctxMenu = document.getElementById('context-menu');
+const $fontDisplay = document.getElementById('font-size-display');
+const $btnFontDec = document.getElementById('btn-font-dec');
+const $btnFontInc = document.getElementById('btn-font-inc');
+const $btnFontReset = document.getElementById('btn-font-reset');
+const $pillReadonly = document.getElementById('pill-readonly');
+const $pillEncoding = document.getElementById('pill-encoding');
+const $pillEol = document.getElementById('pill-eol');
+const $btnAbout = document.getElementById('btn-about');
+const $modalAbout = document.getElementById('modal-about');
+const $btnModalClose = document.getElementById('btn-modal-close');
+
+// ==== Apply font size =======================================================
+function applyFontSize() {
+  $editor.style.fontSize = fontSize + 'px';
+  $fontDisplay.textContent = fontSize + 'px';
+  $btnFontDec.disabled = (fontSize <= MIN_FONT);
+  $btnFontInc.disabled = (fontSize >= MAX_FONT);
+  try { localStorage.setItem(FONT_KEY, String(fontSize)); } catch {}
+}
+function changeFontSize(delta) {
+  const next = Math.min(MAX_FONT, Math.max(MIN_FONT, fontSize + delta));
+  if (next !== fontSize) { fontSize = next; applyFontSize(); }
+}
+$btnFontDec.addEventListener('click', () => changeFontSize(-1));
+$btnFontInc.addEventListener('click', () => changeFontSize(+1));
+$btnFontReset.addEventListener('click', () => { fontSize = DEFAULT_FONT; applyFontSize(); });
+applyFontSize();
+
+// ==== Apply tree size =======================================================
+function applyTreeSize() {
+  document.documentElement.style.setProperty('--tree-font-size', TREE_SIZES[treeSize] + 'px');
+  document.documentElement.style.setProperty('--ui-font-delta', UI_FONT_DELTAS[treeSize] + 'px');
+  document.querySelectorAll('.tree-size-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.size === treeSize);
+  });
+  try { localStorage.setItem(TREE_SIZE_KEY, treeSize); } catch {}
+}
+document.querySelectorAll('.tree-size-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    treeSize = b.dataset.size;
+    applyTreeSize();
+  });
+});
+applyTreeSize();
+
+// ==== Sidebar wiring ========================================================
+if (isMobile()) document.body.classList.add('sidebar-hidden');
+$btnToggleSidebar.addEventListener('click', () => {
+  setSidebarVisible(document.body.classList.contains('sidebar-hidden'));
+});
+$sidebarBackdrop.addEventListener('click', () => setSidebarVisible(false));
+
+let wasMobile = isMobile();
+window.addEventListener('resize', () => {
+  const nowMobile = isMobile();
+  if (wasMobile !== nowMobile) {
+    setSidebarVisible(!nowMobile);
+    wasMobile = nowMobile;
+  }
+});
+
+// ==== Binary detection ======================================================
+const BINARY_EXTS = new Set([
+  'png','jpg','jpeg','gif','bmp','ico','webp',
+  'pdf','zip','tar','gz','7z','rar',
+  'exe','dll','so','dylib','bin',
+  'mp3','mp4','mov','avi','wav','ogg','webm','flac',
+  'woff','woff2','ttf','otf','eot',
+  'psd','ai','sketch','xlsx','docx','pptx'
+]);
+function isProbablyText(name) {
+  const parts = name.split('.');
+  if (parts.length < 2) return true;
+  return !BINARY_EXTS.has(parts.pop().toLowerCase());
+}
+
+// ==== Path helpers ==========================================================
+function joinPath(dir, name) { return dir ? dir + '/' + name : name; }
+function parentOf(path) {
+  const i = path.lastIndexOf('/');
+  return i < 0 ? '' : path.slice(0, i);
+}
+function basename(path) {
+  const i = path.lastIndexOf('/');
+  return i < 0 ? path : path.slice(i + 1);
+}
+function isAncestor(ancestor, descendant) {
+  return descendant === ancestor || descendant.startsWith(ancestor + '/');
+}
+async function getDirHandleByPath(path) {
+  if (!path) return rootHandle;
+  const parts = path.split('/').filter(Boolean);
+  let current = rootHandle;
+  for (const p of parts) current = await current.getDirectoryHandle(p);
+  return current;
+}
+
+// ==== Boot / reconnect ======================================================
+async function init() {
+  try {
+    const saved = await idbGet(KEY_LAST);
+    if (!saved) return;
+    const perm = await saved.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted') {
+      await adoptRoot(saved);
+    } else {
+      $btnReconnect.textContent = `↻ 前回: ${saved.name}`;
+      $btnReconnect.style.display = '';
+      $btnReconnect.onclick = async () => {
+        const p = await saved.requestPermission({ mode: 'readwrite' });
+        if (p === 'granted') {
+          $btnReconnect.style.display = 'none';
+          await adoptRoot(saved);
+        } else {
+          alert('権限が得られませんでした');
+        }
+      };
+    }
+  } catch (e) {
+    console.warn('保存済みハンドルの復元失敗', e);
+  }
+}
+
+async function adoptRoot(handle) {
+  rootHandle = handle;
+  $path.textContent = handle.name + '/';
+  $sidebarToolbar.style.display = '';
+  expandedPaths.clear();
+  await renderTree();
+  try { await idbPut(KEY_LAST, handle); } catch {}
+}
+
+// ==== Open folder ===========================================================
+const WARN_ACK_KEY = 'fs-warning-ack-v1';
+
+function showFolderWarning() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'warn-overlay';
+    overlay.innerHTML = `
+      <div class="warn-modal" role="dialog" aria-labelledby="warn-title" aria-modal="true">
+        <h2 id="warn-title">⚠ 権限に関する重要な注意</h2>
+        <p>このアプリは、選択したフォルダ配下の<b>すべてのファイルに対して読み書き・削除の権限</b>を持ちます。</p>
+        <p style="margin-top:10px;">以下のような<b>システム的・個人的に重要なフォルダの選択は避けてください</b>：</p>
+        <ul>
+          <li><code>C:\\</code> / <code>/</code> などルート直下</li>
+          <li>Desktop / Documents / Downloads</li>
+          <li>OneDrive / iCloud / Dropbox の同期フォルダ</li>
+          <li>Git リポジトリや開発プロジェクトのルート</li>
+        </ul>
+        <p>推奨は、このエディタ専用に作った作業フォルダ（例: <code>C:\\tsui-workspace\\</code>）です。</p>
+        <p class="warn-note">この警告は初回のみ表示されます。</p>
+        <div class="warn-actions">
+          <button id="warn-cancel">キャンセル</button>
+          <button id="warn-ok" class="primary">理解した上で開く</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const cleanup = (ok) => {
+      document.removeEventListener('keydown', onKey);
+      overlay.remove();
+      resolve(ok);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') cleanup(false);
+      else if (e.key === 'Enter') cleanup(true);
+    };
+    document.addEventListener('keydown', onKey);
+
+    overlay.querySelector('#warn-ok').onclick = () => cleanup(true);
+    overlay.querySelector('#warn-cancel').onclick = () => cleanup(false);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) cleanup(false); });
+
+    // フォーカスを「理解した上で開く」に当てる（Enterで即確定できるようにする意図ではなく、
+    // スクリーンリーダー／キーボード操作で現在位置を明示するため）
+    setTimeout(() => overlay.querySelector('#warn-ok').focus(), 0);
+  });
+}
+
+$btnOpen.addEventListener('click', async () => {
+  if (anyModified() && !confirm('未保存のタブがあります。破棄して別フォルダを開きますか？')) return;
+
+  // 初回のみ強い警告を表示
+  if (!localStorage.getItem(WARN_ACK_KEY)) {
+    const ok = await showFolderWarning();
+    if (!ok) return;
+    try { localStorage.setItem(WARN_ACK_KEY, '1'); } catch {}
+  }
+
+  try {
+    const h = await window.showDirectoryPicker({ mode: 'readwrite' });
+    closeAllTabs();
+    await adoptRoot(h);
+    $btnReconnect.style.display = 'none';
+  } catch (e) {
+    if (e.name !== 'AbortError') alert('フォルダを開けませんでした: ' + e.message);
+  }
+});
+
+// ==== Tree ==================================================================
+async function renderTree() {
+  $tree.innerHTML = '';
+  if (!rootHandle) {
+    $tree.appendChild($sidebarEmpty);
+    return;
+  }
+  await loadChildrenInto($tree, rootHandle, '', 0);
+}
+
+async function loadChildrenInto(containerEl, dirHandle, pathPrefix, depth) {
+  containerEl.innerHTML = '';
+  let entries = [];
+  try {
+    for await (const entry of dirHandle.values()) entries.push(entry);
+  } catch (e) {
+    const err = document.createElement('div');
+    err.className = 'empty-state';
+    err.textContent = '読込エラー: ' + e.message;
+    containerEl.appendChild(err);
+    return;
+  }
+  entries.sort((a, b) => {
+    if (a.kind !== b.kind) return a.kind === 'directory' ? -1 : 1;
+    return a.name.localeCompare(b.name, 'ja');
+  });
+  for (const entry of entries) {
+    const path = joinPath(pathPrefix, entry.name);
+    const item = createTreeItem(entry, path, depth);
+    containerEl.appendChild(item);
+  }
+}
+
+function createTreeItem(entry, path, depth) {
+  const item = document.createElement('div');
+  item.className = 'tree-item';
+  item.dataset.path = path;
+  item.dataset.kind = entry.kind;
+
+  const row = document.createElement('div');
+  row.className = 'tree-node';
+  row.style.paddingLeft = (8 + depth * 14) + 'px';
+  row.draggable = true;
+
+  const icon = document.createElement('span');
+  icon.className = 'tree-icon';
+  const label = document.createElement('span');
+  label.className = 'tree-label';
+  label.textContent = entry.name;
+  row.appendChild(icon);
+  row.appendChild(label);
+
+  // 右端の⋮メニュー（モバイルでは常時表示、PCではホバー時表示）
+  // 長押し＋ドラッグの競合を解消し、明示的な操作点を提供する
+  const menuBtn = document.createElement('button');
+  menuBtn.className = 'tree-menu-btn';
+  menuBtn.type = 'button';
+  menuBtn.textContent = '⋮';
+  menuBtn.title = 'メニュー';
+  menuBtn.setAttribute('aria-label', 'メニュー');
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const rect = menuBtn.getBoundingClientRect();
+    openTreeItemMenu(row, rect.left, rect.bottom);
+  });
+  // メニューボタン自身はドラッグ起点にしない
+  menuBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+  row.appendChild(menuBtn);
+
+  row.addEventListener('dragstart', (e) => {
+    dragState = { path, kind: entry.kind };
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', path); } catch {}
+    document.body.classList.add('dragging');
+    e.stopPropagation();
+  });
+  row.addEventListener('dragend', () => {
+    document.body.classList.remove('dragging');
+    clearDropHighlights();
+    dragState = null;
+  });
+
+  if (entry.kind === 'directory') {
+    const childrenEl = document.createElement('div');
+    childrenEl.className = 'tree-children';
+
+    const actions = document.createElement('div');
+    actions.className = 'tree-node-actions';
+    const actFile = document.createElement('span');
+    actFile.className = 'tree-action-btn';
+    actFile.textContent = '＋F';
+    actFile.title = 'このフォルダに新規ファイル';
+    actFile.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const n = prompt(`「${path}」に作成するファイル名:`, 'untitled.txt');
+      if (n) { expandedPaths.add(path); await createFileAt(path, n.trim()); }
+    });
+    const actFolder = document.createElement('span');
+    actFolder.className = 'tree-action-btn';
+    actFolder.textContent = '＋D';
+    actFolder.title = 'このフォルダに新規フォルダ';
+    actFolder.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const n = prompt(`「${path}」に作成するフォルダ名:`, 'new-folder');
+      if (n) { expandedPaths.add(path); await createFolderAt(path, n.trim()); }
+    });
+    actions.appendChild(actFile);
+    actions.appendChild(actFolder);
+    row.appendChild(actions);
+
+    item.appendChild(row);
+    item.appendChild(childrenEl);
+
+    const isExpanded = expandedPaths.has(path);
+    icon.textContent = isExpanded ? '▾' : '▸';
+    childrenEl.style.display = isExpanded ? '' : 'none';
+    if (isExpanded) loadChildrenInto(childrenEl, entry, path, depth + 1);
+
+    row.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const nowOpen = !expandedPaths.has(path);
+      if (nowOpen) {
+        expandedPaths.add(path);
+        icon.textContent = '▾';
+        childrenEl.style.display = '';
+        if (childrenEl.childElementCount === 0) {
+          await loadChildrenInto(childrenEl, entry, path, depth + 1);
+        }
+      } else {
+        expandedPaths.delete(path);
+        icon.textContent = '▸';
+        childrenEl.style.display = 'none';
+      }
+    });
+  } else {
+    icon.textContent = '·';
+    if (tabs.some(t => t.path === path)) row.classList.add('open-in-tab');
+    if (activeTabIndex >= 0 && tabs[activeTabIndex].path === path) row.classList.add('active');
+    row.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await openInTab(entry, path);
+    });
+    item.appendChild(row);
+  }
+  return item;
+}
+
+function updateTreeHighlights() {
+  $tree.querySelectorAll('.tree-item[data-kind="file"]').forEach(item => {
+    const row = item.querySelector(':scope > .tree-node');
+    if (!row) return;
+    row.classList.remove('active', 'open-in-tab');
+    if (tabs.some(t => t.path === item.dataset.path)) row.classList.add('open-in-tab');
+    if (activeTabIndex >= 0 && tabs[activeTabIndex].path === item.dataset.path) row.classList.add('active');
+  });
+}
+
+// ==== Drag & Drop ===========================================================
+$tree.addEventListener('dragover', (e) => {
+  if (!dragState) return;
+  const rowEl = e.target.closest('.tree-node');
+  let destPath = '';
+  let targetRow = null;
+  if (rowEl) {
+    const item = rowEl.closest('.tree-item');
+    if (!item || item.dataset.kind !== 'directory') {
+      e.dataTransfer.dropEffect = 'none';
+      clearDropHighlights();
+      return;
+    }
+    destPath = item.dataset.path;
+    targetRow = rowEl;
+  }
+  const srcParent = parentOf(dragState.path);
+  if (srcParent === destPath) { e.dataTransfer.dropEffect = 'none'; clearDropHighlights(); return; }
+  if (dragState.path === destPath) { e.dataTransfer.dropEffect = 'none'; clearDropHighlights(); return; }
+  if (dragState.kind === 'directory' && isAncestor(dragState.path, destPath)) {
+    e.dataTransfer.dropEffect = 'none'; clearDropHighlights(); return;
+  }
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  clearDropHighlights();
+  if (targetRow) targetRow.classList.add('drop-target');
+  else $tree.classList.add('drop-target-root');
+});
+
+$tree.addEventListener('dragleave', (e) => {
+  if (!$tree.contains(e.relatedTarget)) clearDropHighlights();
+});
+
+$tree.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  const prevState = dragState;
+  clearDropHighlights();
+  if (!prevState) return;
+  const rowEl = e.target.closest('.tree-node');
+  let destPath = '';
+  if (rowEl) {
+    const item = rowEl.closest('.tree-item');
+    if (!item || item.dataset.kind !== 'directory') return;
+    destPath = item.dataset.path;
+  }
+  const srcParent = parentOf(prevState.path);
+  if (srcParent === destPath) return;
+  if (prevState.path === destPath) return;
+  if (prevState.kind === 'directory' && isAncestor(prevState.path, destPath)) {
+    alert('自分自身または子孫には移動できません');
+    return;
+  }
+  await moveEntry(prevState.path, prevState.kind, destPath);
+});
+
+function clearDropHighlights() {
+  $tree.classList.remove('drop-target-root');
+  $tree.querySelectorAll('.tree-node.drop-target').forEach(el => el.classList.remove('drop-target'));
+}
+
+async function moveEntry(srcPath, srcKind, destDirPath) {
+  try {
+    const srcParent = await getDirHandleByPath(parentOf(srcPath));
+    const destDir = await getDirHandleByPath(destDirPath);
+    const srcName = basename(srcPath);
+    await ensurePermission(srcParent);
+    await ensurePermission(destDir);
+
+    let existingFile = false, existingDir = false;
+    try { await destDir.getFileHandle(srcName); existingFile = true; } catch {}
+    try { await destDir.getDirectoryHandle(srcName); existingDir = true; } catch {}
+    if (existingFile || existingDir) {
+      if (srcKind === 'file' && existingFile && !existingDir) {
+        if (!confirm(`移動先に「${srcName}」が既に存在します。上書きしますか？`)) return;
+      } else {
+        alert(`移動先に同名の${existingDir ? 'フォルダ' : 'ファイル'}が既に存在します`);
+        return;
+      }
+    }
+
+    const srcHandle = srcKind === 'file'
+      ? await srcParent.getFileHandle(srcName)
+      : await srcParent.getDirectoryHandle(srcName);
+
+    if (typeof srcHandle.move === 'function') {
+      try {
+        await srcHandle.move(destDir, srcName);
+        const newPath = joinPath(destDirPath, srcName);
+        handleTabsAfterRename(srcPath, newPath, srcHandle);
+        fixExpandedAfterRename(srcPath, newPath);
+        expandedPaths.add(destDirPath);
+        await renderTree();
+        flashStatus(`移動: ${srcName}`);
+        return;
+      } catch (err) {
+        console.warn('move() 失敗、fallback:', err);
+      }
+    }
+
+    if (srcKind === 'file') {
+      const file = await srcHandle.getFile();
+      const buf = await file.arrayBuffer();
+      const newHandle = await destDir.getFileHandle(srcName, { create: true });
+      const w = await newHandle.createWritable();
+      await w.write(buf);
+      await w.close();
+      await srcParent.removeEntry(srcName);
+      const newPath = joinPath(destDirPath, srcName);
+      handleTabsAfterRename(srcPath, newPath, newHandle);
+      expandedPaths.add(destDirPath);
+      await renderTree();
+      flashStatus(`移動: ${srcName}`);
+    } else {
+      alert('このブラウザではフォルダの移動に対応していません (ファイルなら可能)');
+    }
+  } catch (e) {
+    alert('移動に失敗: ' + e.message);
+  }
+}
+
+// ==== Tabs ==================================================================
+async function openInTab(fileHandle, path) {
+  const idx = tabs.findIndex(t => t.path === path);
+  if (idx >= 0) {
+    switchTab(idx);
+    if (isMobile()) setSidebarVisible(false);
+    return;
+  }
+  if (!isProbablyText(fileHandle.name)) {
+    if (!confirm(`「${fileHandle.name}」はバイナリの可能性があります。それでも開きますか？`)) return;
+  }
+  try {
+    const file = await fileHandle.getFile();
+
+    // サイズチェック
+    if (file.size >= SIZE_REJECT) {
+      alert(`ファイルサイズが大きすぎます (${formatSize(file.size)} ≥ ${formatSize(SIZE_REJECT)})。\nこのアプリでは開けません。`);
+      return;
+    }
+    let readonly = false;
+    if (file.size >= SIZE_READONLY) {
+      if (!confirm(`大きなファイルです (${formatSize(file.size)})。\n読み取り専用で開きます。続行しますか？`)) return;
+      readonly = true;
+    } else if (file.size >= SIZE_WARN) {
+      if (!confirm(`大きめのファイルです (${formatSize(file.size)})。\n動作が重くなる可能性があります。開きますか？`)) return;
+    }
+
+    // 文字コード自動判定
+    const buf = await file.arrayBuffer();
+    const decoded = decodeBytes(buf);
+    const text = decoded.text;
+    const eol = detectEol(text);
+
+    tabs.push({
+      path, handle: fileHandle,
+      content: text, originalContent: text,
+      originalBytes: new Blob([text]).size,
+      scrollTop: 0, selStart: 0, selEnd: 0,
+      readonly,
+      encoding: decoded.encoding,
+      hasBom: decoded.hasBom,
+      eol,
+      metaDirty: false
+    });
+    switchTab(tabs.length - 1);
+    updateTreeHighlights();
+    if (isMobile()) setSidebarVisible(false);
+  } catch (e) {
+    alert('ファイルを開けませんでした: ' + e.message);
+  }
+}
+
+function saveEditorStateToActive() {
+  if (activeTabIndex < 0) return;
+  const t = tabs[activeTabIndex];
+  t.content = $editor.value;
+  t.scrollTop = $editor.scrollTop;
+  t.selStart = $editor.selectionStart;
+  t.selEnd = $editor.selectionEnd;
+}
+
+function switchTab(idx) {
+  if (idx === activeTabIndex) { renderTabs(); return; }
+  flushInputDebounce();
+  saveEditorStateToActive();
+  activeTabIndex = idx;
+  applyActiveTab();
+  renderTabs();
+  updateTreeHighlights();
+}
+
+function applyActiveTab() {
+  if (activeTabIndex < 0) {
+    $editor.value = '';
+    $editor.disabled = true;
+    $editor.readOnly = false;
+    $btnSave.disabled = true;
+    $statusInfo.textContent = '';
+    $editorEmpty.style.display = 'flex';
+    return;
+  }
+  const t = tabs[activeTabIndex];
+  $editor.disabled = false;
+  $editor.readOnly = !!t.readonly;
+  $editor.value = t.content;
+  $editor.scrollTop = t.scrollTop;
+  try { $editor.setSelectionRange(t.selStart, t.selEnd); } catch {}
+  $editorEmpty.style.display = 'none';
+  updateSaveButton();
+  updateStatus();
+  $editor.focus();
+}
+
+function closeTab(idx) {
+  const t = tabs[idx];
+  if (t.content !== t.originalContent) {
+    if (!confirm(`「${t.path}」の変更は保存されていません。破棄しますか？`)) return;
+  }
+  tabs.splice(idx, 1);
+  if (tabs.length === 0) activeTabIndex = -1;
+  else if (idx < activeTabIndex) activeTabIndex--;
+  else if (idx === activeTabIndex) activeTabIndex = Math.min(idx, tabs.length - 1);
+  applyActiveTab();
+  renderTabs();
+  updateTreeHighlights();
+}
+
+function closeAllTabs() {
+  tabs = [];
+  activeTabIndex = -1;
+  applyActiveTab();
+  renderTabs();
+}
+
+function renderTabs() {
+  $tabBar.innerHTML = '';
+  tabs.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (i === activeTabIndex ? ' active' : '');
+    el.title = t.path;
+    const name = document.createElement('span');
+    name.className = 'tab-name';
+    name.textContent = basename(t.path);
+    el.appendChild(name);
+    if (t.content !== t.originalContent) {
+      const dot = document.createElement('span');
+      dot.className = 'tab-modified';
+      dot.textContent = '●';
+      el.appendChild(dot);
+    }
+    const close = document.createElement('span');
+    close.className = 'tab-close';
+    close.textContent = '×';
+    close.addEventListener('click', (e) => { e.stopPropagation(); closeTab(i); });
+    el.appendChild(close);
+    el.addEventListener('click', () => switchTab(i));
+    el.addEventListener('auxclick', (e) => { if (e.button === 1) closeTab(i); });
+    $tabBar.appendChild(el);
+  });
+}
+
+function anyModified() { return tabs.some(t => t.content !== t.originalContent); }
+
+// ==== Editor input ==========================================================
+// 大ファイル編集時の体感軽量化のため、重い再描画（タブバー/ステータスバー）
+// は 120ms debounce。保存ボタンの有効化だけは即時で Ctrl+S の反応を保つ。
+let inputDebounceTimer = null;
+function flushInputDebounce() {
+  if (inputDebounceTimer !== null) {
+    clearTimeout(inputDebounceTimer);
+    inputDebounceTimer = null;
+    updateStatus();
+    renderTabs();
+  }
+}
+$editor.addEventListener('input', () => {
+  if (activeTabIndex < 0) return;
+  const t = tabs[activeTabIndex];
+  t.content = $editor.value;
+  updateSaveButton();
+  clearTimeout(inputDebounceTimer);
+  inputDebounceTimer = setTimeout(() => {
+    inputDebounceTimer = null;
+    updateStatus();
+    renderTabs();
+  }, 120);
+});
+$editor.addEventListener('scroll', () => {
+  if (activeTabIndex >= 0) tabs[activeTabIndex].scrollTop = $editor.scrollTop;
+});
+
+function updateSaveButton() {
+  if (activeTabIndex < 0) { $btnSave.disabled = true; return; }
+  const t = tabs[activeTabIndex];
+  if (t.readonly) { $btnSave.disabled = true; return; }
+  $btnSave.disabled = (t.content === t.originalContent && !t.metaDirty);
+}
+function updateStatus() {
+  if (activeTabIndex < 0) {
+    $statusInfo.textContent = '';
+    updatePills();
+    return;
+  }
+  const t = tabs[activeTabIndex];
+  // 未修正時は保存済みの正確なバイト数を使う。修正中は original の比率で推定し、
+  // 「〜」プレフィックスで概算表示であることを明示する（Blob再計算のコスト回避）。
+  let bytesLabel;
+  if (t.content === t.originalContent) {
+    bytesLabel = formatSize(t.originalBytes);
+  } else {
+    const origLen = t.originalContent.length;
+    const ratio = origLen > 0 ? (t.originalBytes / origLen) : 1;
+    const est = Math.round(t.content.length * ratio);
+    bytesLabel = '~' + formatSize(est);
+  }
+  $statusInfo.textContent = `${t.path} · ${bytesLabel} · ${t.content.length.toLocaleString()} 文字`;
+  updatePills();
+}
+function updatePills() {
+  if (activeTabIndex < 0) {
+    $pillReadonly.style.display = 'none';
+    $pillEncoding.style.display = 'none';
+    $pillEol.style.display = 'none';
+    return;
+  }
+  const t = tabs[activeTabIndex];
+  $pillReadonly.style.display = t.readonly ? '' : 'none';
+  $pillEncoding.style.display = '';
+  $pillEncoding.textContent = t.encoding + (t.hasBom ? ' BOM' : '');
+  $pillEol.style.display = '';
+  $pillEol.textContent = t.eol;
+}
+
+// ==== Save ==================================================================
+async function saveActive() {
+  if (activeTabIndex < 0) return;
+  const t = tabs[activeTabIndex];
+  if (t.readonly) return;
+  if (t.content === t.originalContent && !t.metaDirty) return;
+  flushInputDebounce();
+  try {
+    await ensurePermission(t.handle);
+    const result = encodeForSave(t.content, { encoding: t.encoding, hasBom: t.hasBom, eol: t.eol });
+    // Shift_JIS / EUC-JP 等は UTF-8 にフォールバックされる旨を1回だけ通知
+    if (result.fallback) {
+      if (!confirm(`${t.encoding} での保存はこのアプリでは非対応のため、UTF-8 で保存します。\n(以降、この形式で保存されます)`)) return;
+      t.encoding = result.actualEncoding;
+      t.hasBom = false;
+    }
+    const writable = await t.handle.createWritable();
+    await writable.write(result.bytes);
+    await writable.close();
+    t.originalContent = t.content;
+    t.originalBytes = result.bytes.byteLength;
+    t.metaDirty = false;
+    updateSaveButton();
+    updateStatus();
+    renderTabs();
+    flashStatus('保存しました');
+  } catch (e) {
+    alert('保存に失敗しました: ' + e.message);
+  }
+}
+async function ensurePermission(handle) {
+  const perm = await handle.queryPermission({ mode: 'readwrite' });
+  if (perm === 'granted') return;
+  const req = await handle.requestPermission({ mode: 'readwrite' });
+  if (req !== 'granted') throw new Error('書き込み権限がありません');
+}
+$btnSave.addEventListener('click', saveActive);
+
+// ==== Pill interactions =====================================================
+$pillEncoding.addEventListener('click', (e) => {
+  if (activeTabIndex < 0) return;
+  e.stopPropagation();
+  const t = tabs[activeTabIndex];
+  const items = [
+    { label: '── 再読込 ──' },
+    { label: 'UTF-8 で再読込', action: () => reloadWithEncoding('UTF-8', false) },
+    { label: 'UTF-8 BOM で再読込', action: () => reloadWithEncoding('UTF-8', true) },
+    { label: 'Shift_JIS で再読込', action: () => reloadWithEncoding('Shift_JIS', false) },
+    { label: 'EUC-JP で再読込', action: () => reloadWithEncoding('EUC-JP', false) },
+    { label: 'UTF-16LE で再読込', action: () => reloadWithEncoding('UTF-16LE', false) },
+    { separator: true },
+    { label: '── 保存時の形式を変更 ──' },
+    { label: 'UTF-8 (BOM無し) にする' + (t.encoding === 'UTF-8' && !t.hasBom ? ' ✓' : ''),
+      action: () => { t.encoding = 'UTF-8'; t.hasBom = false; markDirty(); updateStatus(); } },
+    { label: 'UTF-8 BOM にする' + (t.encoding === 'UTF-8' && t.hasBom ? ' ✓' : ''),
+      action: () => { t.encoding = 'UTF-8'; t.hasBom = true; markDirty(); updateStatus(); } },
+    { label: 'UTF-16LE BOM にする' + (t.encoding === 'UTF-16LE' ? ' ✓' : ''),
+      action: () => { t.encoding = 'UTF-16LE'; t.hasBom = true; markDirty(); updateStatus(); } },
+  ];
+  const rect = $pillEncoding.getBoundingClientRect();
+  showContextMenu(rect.left, rect.top - 8, items, 'up');
+});
+
+$pillEol.addEventListener('click', (e) => {
+  if (activeTabIndex < 0) return;
+  e.stopPropagation();
+  const t = tabs[activeTabIndex];
+  const items = [
+    { label: 'LF (Unix/macOS)' + (t.eol === 'LF' ? ' ✓' : ''),
+      action: () => { t.eol = 'LF'; markDirty(); updateStatus(); } },
+    { label: 'CRLF (Windows)' + (t.eol === 'CRLF' ? ' ✓' : ''),
+      action: () => { t.eol = 'CRLF'; markDirty(); updateStatus(); } },
+    { label: 'CR (旧Mac)' + (t.eol === 'CR' ? ' ✓' : ''),
+      action: () => { t.eol = 'CR'; markDirty(); updateStatus(); } },
+  ];
+  const rect = $pillEol.getBoundingClientRect();
+  showContextMenu(rect.left, rect.top - 8, items, 'up');
+});
+
+$pillReadonly.addEventListener('click', (e) => {
+  if (activeTabIndex < 0) return;
+  const t = tabs[activeTabIndex];
+  if (t.readonly) {
+    if (confirm('読み取り専用を解除します。大きなファイルの編集は動作が重くなる可能性があります。続行しますか？')) {
+      t.readonly = false;
+      $editor.readOnly = false;
+      updateStatus();
+      updateSaveButton();
+      flashStatus('書き込み可能にしました');
+    }
+  }
+});
+
+// エンコーディング変更などで「要保存」状態にする
+function markDirty() {
+  if (activeTabIndex < 0) return;
+  const t = tabs[activeTabIndex];
+  // content と originalContent が同じでも保存ボタンを有効化するため、
+  // originalContent の末尾に目印的にゼロ幅を付けるのは避けたい。
+  // 代わりに savedMeta を別途保持して、metaが変わったら dirty 扱いにする。
+  t.metaDirty = true;
+  renderTabs();
+}
+
+// 再読込 (別エンコーディングで読み直す)
+async function reloadWithEncoding(encoding, hasBom) {
+  if (activeTabIndex < 0) return;
+  const t = tabs[activeTabIndex];
+  if (t.content !== t.originalContent) {
+    if (!confirm('未保存の変更があります。破棄して再読込しますか？')) return;
+  }
+  try {
+    const file = await t.handle.getFile();
+    const buffer = await file.arrayBuffer();
+    let bytes = new Uint8Array(buffer);
+    // BOMがあれば除去
+    if (startsWith(bytes, BOM_UTF8)) bytes = bytes.subarray(3);
+    else if (startsWith(bytes, BOM_UTF16LE)) bytes = bytes.subarray(2);
+    else if (startsWith(bytes, BOM_UTF16BE)) bytes = bytes.subarray(2);
+
+    const label = encoding.toLowerCase().replace('_', '-');
+    let text;
+    try {
+      // まずfatalで試し、不正バイトがあればエラー → ユーザーに確認
+      text = new TextDecoder(label, { fatal: true }).decode(bytes);
+    } catch (e) {
+      const ok = confirm(
+        `${encoding} として正しくデコードできませんでした。\n` +
+        `このエンコーディングではないファイルの可能性があります。\n\n` +
+        `文字化けする可能性がありますが、それでも読み込みますか？`
+      );
+      if (!ok) return;
+      // non-fatalで読み込み (U+FFFD 置換)
+      text = new TextDecoder(label).decode(bytes);
+    }
+
+    t.content = text;
+    t.originalContent = text;
+    t.originalBytes = new Blob([text]).size;
+    t.encoding = encoding;
+    t.hasBom = hasBom;
+    t.eol = detectEol(text);
+    t.readonly = (file.size >= SIZE_READONLY);
+    t.metaDirty = false;
+    $editor.value = text;
+    $editor.readOnly = !!t.readonly;
+    updateSaveButton();
+    updateStatus();
+    renderTabs();
+    flashStatus(`${encoding} で再読込`);
+  } catch (e) {
+    alert('再読込に失敗: ' + e.message);
+  }
+}
+
+// ==== About modal ===========================================================
+function openAbout() { $modalAbout.classList.add('open'); }
+function closeAbout() { $modalAbout.classList.remove('open'); }
+$btnAbout.addEventListener('click', openAbout);
+$btnModalClose.addEventListener('click', closeAbout);
+$modalAbout.addEventListener('click', (e) => {
+  if (e.target === $modalAbout) closeAbout();
+});
+
+// ==== File operations =======================================================
+async function createFileAt(parentPath, name) {
+  try {
+    const dir = await getDirHandleByPath(parentPath);
+    await ensurePermission(dir);
+    const fileHandle = await dir.getFileHandle(name, { create: true });
+    expandedPaths.add(parentPath);
+    await renderTree();
+    // 作成したファイルを自動で開く
+    await openInTab(fileHandle, joinPath(parentPath, name));
+  } catch (e) { alert('ファイル作成に失敗: ' + e.message); }
+}
+async function createFolderAt(parentPath, name) {
+  try {
+    const dir = await getDirHandleByPath(parentPath);
+    await ensurePermission(dir);
+    await dir.getDirectoryHandle(name, { create: true });
+    expandedPaths.add(parentPath);
+    await renderTree();
+  } catch (e) { alert('フォルダ作成に失敗: ' + e.message); }
+}
+async function deleteEntry(path, kind) {
+  try {
+    const parent = await getDirHandleByPath(parentOf(path));
+    await ensurePermission(parent);
+    await parent.removeEntry(basename(path), { recursive: kind === 'directory' });
+    handleTabsAfterDelete(path);
+    for (const p of Array.from(expandedPaths)) {
+      if (p === path || p.startsWith(path + '/')) expandedPaths.delete(p);
+    }
+    await renderTree();
+  } catch (e) { alert('削除に失敗: ' + e.message); }
+}
+async function renameEntry(oldPath, kind, newName) {
+  if (!newName || newName === basename(oldPath)) return;
+  if (newName.includes('/') || newName.includes('\\')) {
+    alert('名前に / や \\ は使えません'); return;
+  }
+  const parent = await getDirHandleByPath(parentOf(oldPath));
+  await ensurePermission(parent);
+  const newPath = joinPath(parentOf(oldPath), newName);
+  try {
+    const handle = kind === 'file'
+      ? await parent.getFileHandle(basename(oldPath))
+      : await parent.getDirectoryHandle(basename(oldPath));
+    if (typeof handle.move === 'function') {
+      try {
+        await handle.move(newName);
+        handleTabsAfterRename(oldPath, newPath, handle);
+        fixExpandedAfterRename(oldPath, newPath);
+        await renderTree();
+        return;
+      } catch (e) { console.warn('handle.move() 失敗、fallbackへ:', e); }
+    }
+    if (kind === 'file') {
+      const file = await handle.getFile();
+      const buf = await file.arrayBuffer();
+      const newHandle = await parent.getFileHandle(newName, { create: true });
+      const w = await newHandle.createWritable();
+      await w.write(buf);
+      await w.close();
+      await parent.removeEntry(basename(oldPath));
+      handleTabsAfterRename(oldPath, newPath, newHandle);
+      await renderTree();
+    } else {
+      alert('このブラウザではディレクトリのリネームに対応していません');
+    }
+  } catch (e) { alert('リネームに失敗: ' + e.message); }
+}
+
+function fixExpandedAfterRename(oldPath, newPath) {
+  const toAdd = [];
+  for (const p of Array.from(expandedPaths)) {
+    if (p === oldPath) { expandedPaths.delete(p); toAdd.push(newPath); }
+    else if (p.startsWith(oldPath + '/')) {
+      expandedPaths.delete(p);
+      toAdd.push(newPath + p.slice(oldPath.length));
+    }
+  }
+  for (const p of toAdd) expandedPaths.add(p);
+}
+
+function handleTabsAfterDelete(path) {
+  const beforeActivePath = activeTabIndex >= 0 ? tabs[activeTabIndex].path : null;
+  tabs = tabs.filter(t => !(t.path === path || t.path.startsWith(path + '/')));
+  if (beforeActivePath) {
+    const newIdx = tabs.findIndex(t => t.path === beforeActivePath);
+    activeTabIndex = newIdx >= 0 ? newIdx : (tabs.length ? Math.min(activeTabIndex, tabs.length - 1) : -1);
+  }
+  applyActiveTab();
+  renderTabs();
+}
+
+function handleTabsAfterRename(oldPath, newPath, newHandle) {
+  tabs.forEach(t => {
+    if (t.path === oldPath) { t.path = newPath; t.handle = newHandle; }
+    else if (t.path.startsWith(oldPath + '/')) {
+      t.path = newPath + t.path.slice(oldPath.length);
+    }
+  });
+  renderTabs();
+  updateStatus();
+}
+
+// ==== Toolbar ===============================================================
+$btnNewFile.addEventListener('click', async () => {
+  if (!rootHandle) return;
+  const name = prompt('新規ファイル名:', 'untitled.txt');
+  if (name) await createFileAt('', name.trim());
+});
+$btnNewFolder.addEventListener('click', async () => {
+  if (!rootHandle) return;
+  const name = prompt('新規フォルダ名:', 'new-folder');
+  if (name) await createFolderAt('', name.trim());
+});
+$btnRefresh.addEventListener('click', () => renderTree());
+
+// ==== Context menu ==========================================================
+// ツリー項目に対するメニュー表示（PCの右クリック／モバイルの⋮タップの両方から呼ぶ）
+function openTreeItemMenu(rowEl, clientX, clientY) {
+  if (!rowEl) {
+    // 空白クリック時: ルート直下の新規作成メニュー
+    showContextMenu(clientX, clientY, [
+      { label: '＋ 新規ファイル', action: async () => {
+        const n = prompt('ファイル名:', 'untitled.txt');
+        if (n) await createFileAt('', n.trim());
+      }},
+      { label: '＋ 新規フォルダ', action: async () => {
+        const n = prompt('フォルダ名:', 'new-folder');
+        if (n) await createFolderAt('', n.trim());
+      }}
+    ]);
+    return;
+  }
+  const item = rowEl.closest('.tree-item');
+  if (!item) return;
+  const path = item.dataset.path;
+  const kind = item.dataset.kind;
+  if (kind === 'directory') {
+    showContextMenu(clientX, clientY, [
+      { label: '＋ 新規ファイル', action: async () => {
+        const n = prompt('ファイル名:', 'untitled.txt');
+        if (n) { expandedPaths.add(path); await createFileAt(path, n.trim()); }
+      }},
+      { label: '＋ 新規フォルダ', action: async () => {
+        const n = prompt('フォルダ名:', 'new-folder');
+        if (n) { expandedPaths.add(path); await createFolderAt(path, n.trim()); }
+      }},
+      { separator: true },
+      { label: '名前変更', action: () => startInlineRename(rowEl, path, 'directory') },
+      { label: '削除', danger: true, action: async () => {
+        if (confirm(`「${path}」を削除しますか？(中身ごと)`)) await deleteEntry(path, 'directory');
+      }}
+    ]);
+  } else {
+    showContextMenu(clientX, clientY, [
+      { label: '名前変更', action: () => startInlineRename(rowEl, path, 'file') },
+      { label: '削除', danger: true, action: async () => {
+        if (confirm(`「${path}」を削除しますか？`)) await deleteEntry(path, 'file');
+      }}
+    ]);
+  }
+}
+
+$tree.addEventListener('contextmenu', (e) => {
+  if (!rootHandle) return;
+  e.preventDefault();
+  const rowEl = e.target.closest('.tree-node');
+  openTreeItemMenu(rowEl, e.clientX, e.clientY);
+});
+
+function showContextMenu(x, y, items, placement = 'down') {
+  $ctxMenu.innerHTML = '';
+  for (const item of items) {
+    if (item.separator) {
+      const sep = document.createElement('div');
+      sep.className = 'context-separator';
+      $ctxMenu.appendChild(sep);
+      continue;
+    }
+    const it = document.createElement('div');
+    it.className = 'context-item' + (item.danger ? ' danger' : '');
+    it.textContent = item.label;
+    if (!item.action) {
+      // クリック無効の見出しラベル
+      it.style.color = 'var(--fg-faint)';
+      it.style.fontSize = '10.5px';
+      it.style.pointerEvents = 'none';
+      it.style.padding = '4px 12px 2px';
+    } else {
+      it.addEventListener('click', () => { hideContextMenu(); item.action(); });
+    }
+    $ctxMenu.appendChild(it);
+  }
+  $ctxMenu.style.display = 'block';
+  const rect = $ctxMenu.getBoundingClientRect();
+  let ry = y;
+  if (placement === 'up') ry = y - rect.height;
+  if (ry < 8) ry = 8;
+  ry = Math.min(ry, window.innerHeight - rect.height - 8);
+  const rx = Math.min(x, window.innerWidth - rect.width - 8);
+  $ctxMenu.style.left = rx + 'px';
+  $ctxMenu.style.top = ry + 'px';
+}
+function hideContextMenu() { $ctxMenu.style.display = 'none'; }
+document.addEventListener('click', hideContextMenu);
+
+// ==== Inline rename =========================================================
+function startInlineRename(rowEl, path, kind) {
+  const labelEl = rowEl.querySelector('.tree-label');
+  if (!labelEl) return;
+  const oldName = labelEl.textContent;
+  const input = document.createElement('input');
+  input.className = 'tree-edit-input';
+  input.value = oldName;
+  labelEl.replaceWith(input);
+  input.focus();
+  if (kind === 'file' && oldName.includes('.')) {
+    input.setSelectionRange(0, oldName.lastIndexOf('.'));
+  } else {
+    input.select();
+  }
+  let done = false;
+  const finish = async (commit) => {
+    if (done) return;
+    done = true;
+    const newName = input.value.trim();
+    const restored = document.createElement('span');
+    restored.className = 'tree-label';
+    restored.textContent = oldName;
+    input.replaceWith(restored);
+    if (commit && newName && newName !== oldName) {
+      await renameEntry(path, kind, newName);
+    }
+  };
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+  });
+  input.addEventListener('blur', () => finish(true));
+  input.addEventListener('click', e => e.stopPropagation());
+}
+
+// ==== Keyboard shortcuts ====================================================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    hideContextMenu();
+    if ($modalAbout.classList.contains('open')) closeAbout();
+  }
+  const mod = e.ctrlKey || e.metaKey;
+  if (!mod) {
+    if (e.key === 'Tab' && document.activeElement === $editor) {
+      e.preventDefault();
+      const s = $editor.selectionStart, ee = $editor.selectionEnd;
+      $editor.value = $editor.value.slice(0, s) + '  ' + $editor.value.slice(ee);
+      $editor.selectionStart = $editor.selectionEnd = s + 2;
+      $editor.dispatchEvent(new Event('input'));
+    }
+    return;
+  }
+  const k = e.key.toLowerCase();
+  if (k === 's') { e.preventDefault(); saveActive(); }
+  else if (k === 'w') {
+    e.preventDefault();
+    if (activeTabIndex >= 0) closeTab(activeTabIndex);
+  } else if (k === 'n') {
+    e.preventDefault();
+    if (rootHandle) {
+      const n = prompt('新規ファイル名:', 'untitled.txt');
+      if (n) createFileAt('', n.trim());
+    }
+  } else if (k === 'b') {
+    e.preventDefault();
+    setSidebarVisible(document.body.classList.contains('sidebar-hidden'));
+  }
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (anyModified()) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// ==== Mobile back button guard ==============================================
+// モバイルの戻るボタンで意図せずアプリが閉じるのを防ぐ。
+// 仕組み: 起動時にダミー履歴を1つ積み、popstate を捕捉。
+// 未保存タブがあれば確認、キャンセル時は再度 pushState で留まる。
+// 未保存が無ければそのまま閉じる（毎回確認で鬱陶しくならないように）。
+(() => {
+  try { history.pushState({ tsuiGuard: true }, ''); } catch {}
+
+  window.addEventListener('popstate', (e) => {
+    if (anyModified()) {
+      if (confirm('未保存のタブがあります。破棄して閉じますか？')) {
+        // ユーザーが閉じることに同意 → そのまま離脱させる
+        // (このpopstateで既に履歴が1つ戻っているので、もう一度戻る動作をさせる)
+        history.back();
+      } else {
+        // 留まる: 再度ダミー履歴を積み直す
+        try { history.pushState({ tsuiGuard: true }, ''); } catch {}
+      }
+    } else {
+      // 未保存なし: 素直に閉じる動作を許容（追加履歴は積まない）
+      // 元々の戻る動作が完了した状態なので何もしない
+    }
+  });
+})();
+
+// ==== Helpers ===============================================================
+function formatSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1024 / 1024).toFixed(2) + ' MB';
+}
+let flashTimer = null;
+function flashStatus(msg) {
+  $statusInfo.textContent = '✓ ' + msg;
+  $statusInfo.style.color = 'var(--accent)';
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => {
+    $statusInfo.style.color = '';
+    updateStatus();
+  }, 1500);
+}
+
+// ==== PWA (manifest & Service Worker) =======================================
+// file:// では CORS エラーになるだけで効果も無いので、http/https の時のみ有効化
+(() => {
+  const scheme = location.protocol;
+  if (scheme !== 'http:' && scheme !== 'https:') return;
+  // manifest を動的に追加
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = './manifest.json';
+    document.head.appendChild(link);
+  }
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    });
+  }
+})();
+
+// ==== Go ====================================================================
+init();
+</script>
+</body>
+</html>
