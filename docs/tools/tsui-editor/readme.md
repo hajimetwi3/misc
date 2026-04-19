@@ -37,3 +37,18 @@
 ---  
 ## 外部送信していない事の確認方法  
 DevToolsのNetworkタブ等でご確認いただけますと幸いです。  
+
+---  
+## アナウンス  
+- note.comで記事を公開中です。  
+  [https://note.com/hajimetwi3/n/nf5467f5481ae](https://note.com/hajimetwi3/n/nf5467f5481ae)
+
+- Xでもアナウンスしています。  
+  [https://x.com/hajimetwi3/status/2045759208130568283](https://x.com/hajimetwi3/status/2045759208130568283)
+  
+---  
+## 障害情報  
+Androidで日本語フォルダ名を用いると、ファイルを保存する際にエラーが発生するという事象が発生することがあるようです。  
+⇒ 最初に指定するフォルダ名に日本語を使わない事で回避することが可能です。  
+
+
