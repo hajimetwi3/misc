@@ -5,6 +5,9 @@
 
 <img width="480" alt="image" src="./images/tsui1.1.jpg" />  
 
+## 動作要件  
+現状、Chromium 系のみ対応（chrome、Edgeで動きます）  
+
 ## 使い方
 
 1. [https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html](https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html) をブラウザから直接開く  
@@ -30,4 +33,7 @@
       - OneDrive / iCloud / Dropbox の同期フォルダ  
       - Git リポジトリや開発プロジェクトのルート  
   - このエディタ専用に作業フォルダ（例: <code>C:\\tsui-workspace\\</code>）を作る事を強く推奨します。
-  
+
+---  
+## 外部送信していない事の確認方法  
+DevToolsのNetworkタブ等でご確認いただけますと幸いです。  
