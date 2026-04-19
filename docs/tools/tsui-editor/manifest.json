@@ -1,0 +1,18 @@
+{
+  "name": "Tsui Editor",
+  "short_name": "Tsui Editor",
+  "description": "ブラウザでローカルファイルを編集するシンプルなエディタ。ログイン不要、データの外部送信無し。",
+  "start_url": "./tsui-editor.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMWExYTFhIi8+PHJlY3QgeD0iMTQwIiB5PSIxNDAiIHdpZHRoPSIyMzIiIGhlaWdodD0iMjMyIiByeD0iMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdkZDNjMCIgc3Ryb2tlLXdpZHRoPSIxNiIvPjxsaW5lIHgxPSIxODAiIHkxPSIyMjAiIHgyPSIzMzIiIHkyPSIyMjAiIHN0cm9rZT0iIzdkZDNjMCIgc3Ryb2tlLXdpZHRoPSIxNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjE4MCIgeTE9IjI2MCIgeDI9IjMzMiIgeTI9IjI2MCIgc3Ryb2tlPSIjN2RkM2MwIiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMTgwIiB5MT0iMzAwIiB4Mj0iMjcwIiB5Mj0iMzAwIiBzdHJva2U9IiM3ZGQzYzAiIHN0cm9rZS13aWR0aD0iMTQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
