@@ -1,11 +1,12 @@
 ## Tsui editor  
-ブラウザで動作するシンプルなエディタ。ログイン不要、データの外部送信無し。  
+ブラウザでローカルファイルを編集するシンプルなエディタ。ログイン不要、データの外部送信無し。  
 
 ## 使い方
 
 1. https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html をブラウザから直接開く  
 2. PWAとしてインストール(インストールしなくても良い）  
 3. 完全オフラインで利用したい場合、https://github.com/hajimetwi3/misc/blob/main/docs/tools/tsui-editor/tsui-editor.html をダウンロードしてブラウザから開き利用する事も可能。  
+
 ## ライセンス  
 
 - 本アプリ本体 → [MIT License](./LICENSE)  
