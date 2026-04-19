@@ -10,6 +10,9 @@ title: Misc
 
 ## Tools  
 - [https://hajimetwi3.github.io/misc/tools/yatta/](https://hajimetwi3.github.io/misc/tools/yatta/)  
+- [market-charts](https://hajimetwi3.github.io/misc/tools/market-charts/)  
+- [Tsui Clock](https://hajimetwi3.github.io/misc/tools/tsui-clock/)  
+- [Tsui editor](https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html)  
 
 ## Author  
   
