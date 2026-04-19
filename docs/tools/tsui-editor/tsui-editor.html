@@ -1763,18 +1763,43 @@ async function saveActive() {
   if (t.readonly) return;
   if (t.content === t.originalContent && !t.metaDirty) return;
   flushInputDebounce();
+
   try {
-    await ensurePermission(t.handle);
     const result = encodeForSave(t.content, { encoding: t.encoding, hasBom: t.hasBom, eol: t.eol });
-    // Shift_JIS / EUC-JP 等は UTF-8 にフォールバックされる旨を1回だけ通知
     if (result.fallback) {
       if (!confirm(`${t.encoding} での保存はこのアプリでは非対応のため、UTF-8 で保存します。\n(以降、この形式で保存されます)`)) return;
       t.encoding = result.actualEncoding;
       t.hasBom = false;
     }
-    const writable = await t.handle.createWritable();
-    await writable.write(result.bytes);
-    await writable.close();
+
+    const writeWith = async (handle) => {
+      await ensurePermission(handle);
+      const writable = await handle.createWritable();
+      await writable.write(result.bytes);
+      await writable.close();
+    };
+
+    try {
+      await writeWith(t.handle);
+    } catch (e1) {
+      // InvalidStateError の場合はハンドルを取り直して再試行
+      // (File System Access API の mtime キャッシュ不整合の既知問題への対処)
+      const isStaleState =
+        e1.name === 'InvalidStateError' ||
+        /state had changed|state cached/i.test(e1.message || '');
+
+      if (!isStaleState) throw e1;
+
+      // rootHandle から path 経由でハンドルを再取得
+      const parts = t.path.split('/').filter(Boolean);
+      const fileName = parts.pop();
+      let dir = rootHandle;
+      for (const p of parts) dir = await dir.getDirectoryHandle(p);
+      const freshHandle = await dir.getFileHandle(fileName);
+      t.handle = freshHandle;  // 以降はこの新しいハンドルを使う
+      await writeWith(freshHandle);
+    }
+
     t.originalContent = t.content;
     t.originalBytes = result.bytes.byteLength;
     t.metaDirty = false;
