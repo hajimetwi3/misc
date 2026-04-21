@@ -1,11 +1,12 @@
 'use strict';
 
-const CACHE = 'tsui-clock-v1.2.0';
+const CACHE = 'tsui-clock-v1.3.0';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './pip.js',
   './manifest.webmanifest',
   './icon.svg',
   './fonts/DSEG7Classic-Regular.woff2'
