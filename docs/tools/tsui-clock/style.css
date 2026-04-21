@@ -564,3 +564,25 @@ body {
   .time { animation: none !important; }
   body, .panel { transition: none !important; }
 }
+
+/* ==== Notice (簡易トースト、PiPエラー通知等に使用) ==== */
+.notice {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%) translateY(-160%);
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  z-index: 200;
+  transition: transform 0.25s ease;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+.notice.open { transform: translateX(-50%) translateY(0); }
+
