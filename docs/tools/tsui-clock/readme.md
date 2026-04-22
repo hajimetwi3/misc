@@ -45,6 +45,8 @@
 <img width="480" alt="image" src="./images/setting1.jpg" />  
 <img width="480" alt="image" src="./images/pink1.1.jpg" />  
 
+---  
+
 ## Changelog  
 ### v1.0.0  
 - 初版リリース  
@@ -60,7 +62,18 @@
 - **日付+曜日の表示 ON/OFF** トグルを追加  
 - 設定パネルの行数を整理(SEC+DATE / WAKE+INFO を同一行に統合)  
 ### v1.3.0  
-- **PiP(Picture-in-Picture)** 対応(Chrome / Edge、実験的機能)。設定パネルの PIP: Open から、常時最前面の小窓で時計を表示可能。ウィンドウサイズに合わせて時計も自動で拡大縮小します。  
+- **PiP(Picture-in-Picture)** 対応(Chrome / Edge、実験的機能)。設定パネルの PIP: Open から、常時最前面の小窓で時計を表示可能。ウィンドウサイズに合わせて時計も自動で拡大縮小します。
+
+---  
+
+## アナウンス  
+- note.comで記事を公開中です。   
+  [https://note.com/hajimetwi3/n/nbdf5cbde25fe](https://note.com/hajimetwi3/n/nbdf5cbde25fe)  
+
+- Xでもアナウンスしています。  
+  [https://x.com/hajimetwi3/status/2045293610770563212](https://x.com/hajimetwi3/status/2045293610770563212) 
+
+---  
 
 ## ライセンス  
 
