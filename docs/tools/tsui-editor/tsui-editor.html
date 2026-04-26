@@ -6,6 +6,21 @@
 <meta name="theme-color" content="#1a1a1a">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none';">
 <title>Tsui editor</title>
+ 
+<!-- Clickjacking defense (frame-busting)  -->
+<style id="antiClickjack">html{display:none !important;}</style>
+<script>
+(function(){
+  if (self === top) {
+    var s = document.getElementById('antiClickjack');
+    if (s && s.parentNode) s.parentNode.removeChild(s);
+  } else {
+    try { top.location = self.location; } catch (e) {}
+    try { document.documentElement.innerHTML = ''; } catch (e) {}
+  }
+})();
+</script>
+ 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
