@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マーケットチャート</title>
+
+    <!-- Clickjacking defense (frame-busting)  -->
+    <style id="antiClickjack">html{display:none !important;}</style>
+    <script>
+    (function(){
+      if (self === top) {
+        var s = document.getElementById('antiClickjack');
+        if (s && s.parentNode) s.parentNode.removeChild(s);
+      } else {
+        try { top.location = self.location; } catch (e) {}
+        try { document.documentElement.innerHTML = ''; } catch (e) {}
+      }
+    })();
+    </script>
+
+    
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
