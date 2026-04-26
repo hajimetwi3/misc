@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="シンプルな日次ルーチンチェック。データはブラウザ内のみに保存されます。">
 <meta name="theme-color" content="#fafaf9">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline';
+  connect-src 'none';
+  img-src 'none';
+  font-src 'none';
+  object-src 'none';
+  base-uri 'none';
+  form-action 'none';
+  frame-src 'none';
+">
 <title>やった？(ver1.0)</title>
 <style>
   :root {
