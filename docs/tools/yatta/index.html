@@ -17,6 +17,19 @@
   form-action 'none';
   frame-src 'none';
 ">
+<!-- Clickjacking defense (frame-busting) — 多層防御: CSPのframe-ancestorsと併用 -->
+<style id="antiClickjack">html{display:none !important;}</style>
+<script>
+  (function(){
+    if (self === top) {
+      var s = document.getElementById('antiClickjack');
+      if (s && s.parentNode) s.parentNode.removeChild(s);
+    } else {
+      try { top.location = self.location; } catch (e) {}
+      try { document.documentElement.innerHTML = ''; } catch (e) {}
+    }
+  })();
+</script>
 <title>やった？(ver1.0)</title>
 <style>
   :root {
