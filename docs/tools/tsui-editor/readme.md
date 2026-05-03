@@ -10,9 +10,15 @@
 
 ## 使い方
 
-1. [https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html](https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html) をブラウザから直接開く  
+1. [https://tsuieditor.pages.dev/](https://tsuieditor.pages.dev/) をブラウザから直接開く  
 2. PWAとしてインストール(インストールしなくても良い）  
-3. 完全オフラインで利用したい場合、[https://github.com/hajimetwi3/misc/blob/main/docs/tools/tsui-editor/tsui-editor.html](https://github.com/hajimetwi3/misc/blob/main/docs/tools/tsui-editor/tsui-editor.html) をダウンロードしてブラウザから開き利用する事も可能。  
+3. 完全オフラインで利用したい場合、[https://github.com/hajimetwi3/misc/blob/main/docs/tools/tsui-editor/tsui-editor.html](https://github.com/hajimetwi3/misc/blob/main/docs/tools/tsui-editor/tsui-editor.html) をダウンロードしてブラウザから開き利用する事も可能。
+
+
+※ よりセキュアな環境にするため、Webサイト版のURLに変更が入りました。  
+新：https://tsuieditor.pages.dev/  
+旧：https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html（まだ少しの間、継続して稼働予定）  
+
 
 ## ライセンス  
 
