@@ -37,7 +37,22 @@
     --modified: #e8b842;
     --danger: #e57373;
     --tree-font-size: 12.5px;
-    --ui-font-delta: 0px;  /* Tree S=0px, M=+2px, L=+4px */
+    --ui-font-delta: 0px;  /* Sys Font S=0px, M=+2px, L=+4px, XL=+7px */
+    --glow-color: transparent;
+  }
+
+  /* Themes (calm = default, plus 5 neon variants) — Tsui Clock 互換パレット */
+  html[data-theme="green"]  { --accent:#39ff77; --glow-color:#39ff77; }
+  html[data-theme="amber"]  { --accent:#ffb000; --glow-color:#ffb000; }
+  html[data-theme="red"]    { --accent:#ffc0b8; --glow-color:#ff2020; }
+  html[data-theme="pink"]   { --accent:#ffc8f0; --glow-color:#ff26b3; }
+  html[data-theme="cyber"]  { --accent:#B2FFCA; --glow-color:#39ff77; }
+
+  /* Glow: 静的な見出し系に限定 (編集中の active 要素には付けない) */
+  html[data-theme] .title,
+  html[data-theme] .modal-body h3,
+  html[data-theme] .modal-body .app-name {
+    text-shadow: 0 0 8px var(--glow-color), 0 0 16px var(--glow-color);
   }
 
   body {
@@ -249,6 +264,59 @@
     border-color: var(--accent);
   }
 
+  /* Wrap toggle (Wrap / Scroll) — tree-size-btn と同じ見た目、横幅は文字に合わせる */
+  .wrap-btn {
+    height: 24px;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg-dim);
+    border: 1px solid var(--border);
+    background: transparent;
+    letter-spacing: 0.5px;
+  }
+  .wrap-btn:hover:not(.active) {
+    background: var(--bg-hover);
+    color: var(--fg);
+    border-color: var(--accent);
+  }
+  .wrap-btn.active {
+    background: var(--accent);
+    color: #111;
+    border-color: var(--accent);
+  }
+
+  /* Theme color dots — 6色をドットで並べる */
+  .theme-dot {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--theme-dot-color, var(--fg-dim));
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+  .theme-dot[data-theme="calm"]  { --theme-dot-color: #7dd3c0; }
+  .theme-dot[data-theme="green"] { --theme-dot-color: #39ff77; }
+  .theme-dot[data-theme="amber"] { --theme-dot-color: #ffb000; }
+  .theme-dot[data-theme="red"]   { --theme-dot-color: #ff2020; }
+  .theme-dot[data-theme="pink"]  { --theme-dot-color: #ff26b3; }
+  .theme-dot[data-theme="cyber"] { --theme-dot-color: #B2FFCA; }
+  .theme-dot:hover:not(.active) {
+    transform: scale(1.15);
+    border-color: var(--fg-dim);
+  }
+  .theme-dot.active {
+    border-color: var(--fg);
+    box-shadow: 0 0 0 1.5px var(--bg-elevated), 0 0 0 3px var(--theme-dot-color);
+  }
+
   .about-row {
     border-top: 1px solid var(--border);
     padding: 8px 10px;
@@ -419,10 +487,11 @@
   .tab-modified { color: var(--modified); font-size: 10px; line-height: 1; }
 
   .tab-close {
-    width: 16px; height: 16px;
+    width: calc(16px + var(--ui-font-delta));
+    height: calc(16px + var(--ui-font-delta));
     display: flex; align-items: center; justify-content: center;
     border-radius: 3px;
-    font-size: 14px;
+    font-size: calc(14px + var(--ui-font-delta));
     color: var(--fg-faint);
     margin-left: 2px;
   }
@@ -449,6 +518,13 @@
     white-space: pre;
   }
   #editor:disabled { color: var(--fg-faint); }
+
+  /* Wrap mode (default ON) — 長い行をエディタ幅で折り返す */
+  body.wrap-on #editor {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
 
   .editor-empty {
     position: absolute;
@@ -672,6 +748,23 @@
     text-decoration: none;
   }
   .modal-body a:hover { text-decoration: underline; }
+  .modal-body code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 0.92em;
+    color: var(--fg);
+  }
+  .modal-body ul {
+    padding-left: 1.4em;
+    margin: 4px 0 8px;
+  }
+  .modal-body li {
+    color: var(--fg-dim);
+    margin-bottom: 2px;
+  }
 
   /* ==== Mobile ==== */
   @media (max-width: 768px) {
@@ -783,14 +876,29 @@
       <span class="settings-reset" id="btn-font-reset" title="リセット">reset</span>
     </div>
     <div class="sidebar-settings">
+      <span class="settings-label">Wrap</span>
+      <button class="wrap-btn" data-wrap="on" title="長い行をエディタ幅で折り返す">Wrap</button>
+      <button class="wrap-btn" data-wrap="off" title="折り返さず横スクロール">Scroll</button>
+    </div>
+    <div class="sidebar-settings">
       <span class="settings-label">Sys Font</span>
       <button class="tree-size-btn" data-size="s" title="小 (12.5px)">S</button>
       <button class="tree-size-btn" data-size="m" title="中 (17.5px)">M</button>
       <button class="tree-size-btn" data-size="l" title="大 (20px)">L</button>
+      <button class="tree-size-btn" data-size="xl" title="特大 (23px)">XL</button>
+    </div>
+    <div class="sidebar-settings">
+      <span class="settings-label">Theme</span>
+      <button class="theme-dot" data-theme="calm" title="calm (default)"></button>
+      <button class="theme-dot" data-theme="green" title="green"></button>
+      <button class="theme-dot" data-theme="amber" title="amber"></button>
+      <button class="theme-dot" data-theme="red" title="red"></button>
+      <button class="theme-dot" data-theme="pink" title="pink"></button>
+      <button class="theme-dot" data-theme="cyber" title="cyber"></button>
     </div>
     <div class="sidebar-about" id="btn-about" title="このアプリについて">
       <span>ABOUT</span>
-      <span>v0.5.3</span>
+      <span>v1.0.0</span>
     </div>
   </aside>
   <section id="editor-area">
@@ -825,14 +933,24 @@
     </div>
     <div class="modal-body">
       <div class="app-name">Tsui Editor</div>
-      <div class="version-line">Version 0.5.3</div>
+      <div class="version-line">Version 1.0.0</div>
 
       <h3>About</h3>
-      <p>シンプルなエディタ。ログイン不要、データの外部送信無し。<br>
+      <p><strong>Tsui Editor</strong> はブラウザで動くローカルファイルエディタです。File System Access API でフォルダまるごと読み書き、タブ・ツリーで操作。ログイン不要、インストール不要、データの外部送信なし。<br>
         — <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">詳細</a> —</p>
 
+      <h3>Privacy</h3>
+      <p>ファイルや入力内容は、本アプリ本体から外部送信されません。CSP の <code>connect-src 'none'</code> により、<code>fetch</code> 等のネットワーク送信はブラウザレベルで禁止されています。DevTools の Network タブで確認いただけます。</p>
+      <p>ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。</p>
+      <p>本アプリ本体には計測機能は一切含まれていません（上記 CSP により外部送信が禁止されているため）。</p>
+      <p>一方、作者プロフィールや Tsui series のランディングページ等の情報ページでは、訪問数の把握に Cloudflare Web Analytics を利用しています（Cookie なし / フィンガープリントなし / クロスサイトトラッキングなし）。</p>
+      <p>なお、別途プラットフォーム側（配信元サーバや中継事業者等）で計測・記録されている可能性はあります。</p>
+
+      <h3>注意</h3>
+      <p>File System API の仕様上、選択したフォルダ配下への読み書き・削除権限を持ちます。重要フォルダや同期フォルダではなく、専用の作業フォルダで利用することを推奨します。</p>
+
       <h3>Disclaimer</h3>
-      <p>本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。ご利用は自己責任にてお願いします。</p>
+      <p>本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。ご利用は自己責任にてお願いします。ファイルのバックアップは利用者の責任で行ってください。</p>
 
       <h3>License (This App)</h3>
       <div class="author-line">Copyright (c) 2026 <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener noreferrer">Hajime Tsui</a></div>
@@ -845,6 +963,10 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</div>
+
+      <h3>Related</h3>
+      <p>本アプリは <a href="https://hajimetwi3.github.io/hajimetwi3/Tsui-series/" target="_blank" rel="noopener noreferrer">Tsui series</a>（静かな道具たち）の一つです。</p>
+      <p>GitHub: <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">github.com/hajimetwi3/misc</a></p>
     </div>
   </div>
 </div>
@@ -1048,12 +1170,30 @@ let fontSize = (() => {
 })();
 
 // ==== Tree font size ========================================================
-const TREE_SIZES = { s: 12.5, m: 17.5, l: 20 };
-const UI_FONT_DELTAS = { s: 0, m: 2, l: 4 };  // システム文字の加算px（S基準）
+const TREE_SIZES = { s: 12.5, m: 17.5, l: 20, xl: 23 };
+const UI_FONT_DELTAS = { s: 0, m: 2, l: 4, xl: 7 };  // システム文字の加算px（S基準）
 const TREE_SIZE_KEY = 'tsui-editor-tree-size';
 let treeSize = (() => {
   const v = localStorage.getItem(TREE_SIZE_KEY);
-  return (v === 's' || v === 'm' || v === 'l') ? v : 's';
+  return (v === 's' || v === 'm' || v === 'l' || v === 'xl') ? v : 's';
+})();
+
+// ==== Editor wrap mode ======================================================
+// 'on'  : 長い行をエディタ幅で折り返す (default)
+// 'off' : 折り返さず横スクロール
+const WRAP_KEY = 'tsui-editor-wrap';
+let wrapMode = (() => {
+  const v = localStorage.getItem(WRAP_KEY);
+  return (v === 'on' || v === 'off') ? v : 'on';
+})();
+
+// ==== Theme =================================================================
+// 'calm' (default) または 5つのネオンテーマ — Tsui Clock 互換パレット
+const THEME_KEY = 'tsui-editor-theme';
+const VALID_THEMES = ['calm', 'green', 'amber', 'red', 'pink', 'cyber'];
+let themeMode = (() => {
+  const v = localStorage.getItem(THEME_KEY);
+  return VALID_THEMES.includes(v) ? v : 'calm';
 })();
 
 // ==== Mobile / Sidebar ======================================================
@@ -1125,6 +1265,42 @@ document.querySelectorAll('.tree-size-btn').forEach(b => {
   });
 });
 applyTreeSize();
+
+// ==== Apply wrap mode =======================================================
+function applyWrapMode() {
+  document.body.classList.toggle('wrap-on', wrapMode === 'on');
+  document.querySelectorAll('.wrap-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.wrap === wrapMode);
+  });
+  try { localStorage.setItem(WRAP_KEY, wrapMode); } catch {}
+}
+document.querySelectorAll('.wrap-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    wrapMode = b.dataset.wrap;
+    applyWrapMode();
+  });
+});
+applyWrapMode();
+
+// ==== Apply theme ===========================================================
+function applyTheme() {
+  if (themeMode === 'calm') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.dataset.theme = themeMode;
+  }
+  document.querySelectorAll('.theme-dot').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === themeMode);
+  });
+  try { localStorage.setItem(THEME_KEY, themeMode); } catch {}
+}
+document.querySelectorAll('.theme-dot').forEach(b => {
+  b.addEventListener('click', () => {
+    themeMode = b.dataset.theme;
+    applyTheme();
+  });
+});
+applyTheme();
 
 // ==== Sidebar wiring ========================================================
 if (isMobile()) document.body.classList.add('sidebar-hidden');
@@ -1594,7 +1770,7 @@ async function openInTab(fileHandle, path) {
     tabs.push({
       path, handle: fileHandle,
       content: text, originalContent: text,
-      originalBytes: new Blob([text]).size,
+      originalBytes: file.size,
       scrollTop: 0, selStart: 0, selEnd: 0,
       readonly,
       encoding: decoded.encoding,
@@ -1653,7 +1829,7 @@ function applyActiveTab() {
 
 function closeTab(idx) {
   const t = tabs[idx];
-  if (t.content !== t.originalContent) {
+  if (isTabDirty(t)) {
     if (!confirm(`「${t.path}」の変更は保存されていません。破棄しますか？`)) return;
   }
   tabs.splice(idx, 1);
@@ -1682,7 +1858,7 @@ function renderTabs() {
     name.className = 'tab-name';
     name.textContent = basename(t.path);
     el.appendChild(name);
-    if (t.content !== t.originalContent) {
+    if (isTabDirty(t)) {
       const dot = document.createElement('span');
       dot.className = 'tab-modified';
       dot.textContent = '●';
@@ -1699,7 +1875,9 @@ function renderTabs() {
   });
 }
 
-function anyModified() { return tabs.some(t => t.content !== t.originalContent); }
+// タブの未保存判定: 本文変更 OR メタ情報変更 (encoding/eol)
+function isTabDirty(t) { return t.content !== t.originalContent || !!t.metaDirty; }
+function anyModified() { return tabs.some(isTabDirty); }
 
 // ==== Editor input ==========================================================
 // 大ファイル編集時の体感軽量化のため、重い再描画（タブバー/ステータスバー）
@@ -1733,7 +1911,7 @@ function updateSaveButton() {
   if (activeTabIndex < 0) { $btnSave.disabled = true; return; }
   const t = tabs[activeTabIndex];
   if (t.readonly) { $btnSave.disabled = true; return; }
-  $btnSave.disabled = (t.content === t.originalContent && !t.metaDirty);
+  $btnSave.disabled = !isTabDirty(t);
 }
 function updateStatus() {
   if (activeTabIndex < 0) {
@@ -1742,10 +1920,11 @@ function updateStatus() {
     return;
   }
   const t = tabs[activeTabIndex];
-  // 未修正時は保存済みの正確なバイト数を使う。修正中は original の比率で推定し、
-  // 「〜」プレフィックスで概算表示であることを明示する（Blob再計算のコスト回避）。
+  // 未修正(本文・メタとも未変更)時は保存済みの正確なバイト数を使う。
+  // 本文 or メタが変わると保存時のバイト数も変わり得るため、original の比率で推定し
+  // 「~」プレフィックスで概算表示であることを明示する（Blob再計算のコスト回避）。
   let bytesLabel;
-  if (t.content === t.originalContent) {
+  if (!isTabDirty(t)) {
     bytesLabel = formatSize(t.originalBytes);
   } else {
     const origLen = t.originalContent.length;
@@ -1776,7 +1955,7 @@ async function saveActive() {
   if (activeTabIndex < 0) return;
   const t = tabs[activeTabIndex];
   if (t.readonly) return;
-  if (t.content === t.originalContent && !t.metaDirty) return;
+  if (!isTabDirty(t)) return;
   flushInputDebounce();
 
   try {
@@ -1904,7 +2083,7 @@ function markDirty() {
 async function reloadWithEncoding(encoding, hasBom) {
   if (activeTabIndex < 0) return;
   const t = tabs[activeTabIndex];
-  if (t.content !== t.originalContent) {
+  if (isTabDirty(t)) {
     if (!confirm('未保存の変更があります。破棄して再読込しますか？')) return;
   }
   try {
@@ -1934,7 +2113,7 @@ async function reloadWithEncoding(encoding, hasBom) {
 
     t.content = text;
     t.originalContent = text;
-    t.originalBytes = new Blob([text]).size;
+    t.originalBytes = file.size;
     t.encoding = encoding;
     t.hasBom = hasBom;
     t.eol = detectEol(text);
@@ -1965,6 +2144,14 @@ async function createFileAt(parentPath, name) {
   try {
     const dir = await getDirHandleByPath(parentPath);
     await ensurePermission(dir);
+    // 既存チェック: 同名のファイル/フォルダがあれば拒否(意図しない既存ファイルへのアクセスを防ぐ)
+    let existingFile = false, existingDir = false;
+    try { await dir.getFileHandle(name); existingFile = true; } catch {}
+    try { await dir.getDirectoryHandle(name); existingDir = true; } catch {}
+    if (existingFile || existingDir) {
+      alert(`「${name}」は既に存在します（${existingDir ? 'フォルダ' : 'ファイル'}）。別の名前を指定してください。`);
+      return;
+    }
     const fileHandle = await dir.getFileHandle(name, { create: true });
     expandedPaths.add(parentPath);
     await renderTree();
@@ -1976,6 +2163,14 @@ async function createFolderAt(parentPath, name) {
   try {
     const dir = await getDirHandleByPath(parentPath);
     await ensurePermission(dir);
+    // 既存チェック: 同名のファイル/フォルダがあれば拒否
+    let existingFile = false, existingDir = false;
+    try { await dir.getFileHandle(name); existingFile = true; } catch {}
+    try { await dir.getDirectoryHandle(name); existingDir = true; } catch {}
+    if (existingFile || existingDir) {
+      alert(`「${name}」は既に存在します（${existingDir ? 'フォルダ' : 'ファイル'}）。別の名前を指定してください。`);
+      return;
+    }
     await dir.getDirectoryHandle(name, { create: true });
     expandedPaths.add(parentPath);
     await renderTree();
@@ -2001,12 +2196,28 @@ async function renameEntry(oldPath, kind, newName) {
   const parent = await getDirHandleByPath(parentOf(oldPath));
   await ensurePermission(parent);
   const newPath = joinPath(parentOf(oldPath), newName);
+  // 既存チェック: リネーム先に同名ファイル/フォルダがある場合の上書き判定 (moveEntry と同じパターン)
+  let existingFile = false, existingDir = false;
+  try { await parent.getFileHandle(newName); existingFile = true; } catch {}
+  try { await parent.getDirectoryHandle(newName); existingDir = true; } catch {}
+  if (existingFile || existingDir) {
+    if (kind === 'file' && existingFile && !existingDir) {
+      if (!confirm(`「${newName}」は既に存在します。上書きしますか？`)) return;
+    } else {
+      alert(`「${newName}」は既に存在します（${existingDir ? 'フォルダ' : 'ファイル'}）。別の名前を指定してください。`);
+      return;
+    }
+  }
   try {
     const handle = kind === 'file'
       ? await parent.getFileHandle(basename(oldPath))
       : await parent.getDirectoryHandle(basename(oldPath));
     if (typeof handle.move === 'function') {
       try {
+        // 上書き確認済みなので、handle.move() が既存に阻まれる場合は事前に削除
+        if (existingFile && kind === 'file') {
+          try { await parent.removeEntry(newName); } catch {}
+        }
         await handle.move(newName);
         handleTabsAfterRename(oldPath, newPath, handle);
         fixExpandedAfterRename(oldPath, newPath);

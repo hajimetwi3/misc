@@ -1,6 +1,6 @@
 // Minimal Service Worker for PWA installability and offline shell caching.
 // Cache versioning: bump CACHE_NAME when you ship updated HTML/manifest.
-const CACHE_NAME = 'tsui-editor-v0.5.3';
+const CACHE_NAME = 'tsui-editor-v1.0.0';
 const ASSETS = [
   './',
   './tsui-editor.html',
