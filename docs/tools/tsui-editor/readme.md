@@ -41,7 +41,7 @@ DevToolsのNetworkタブ等でご確認いただけますと幸いです。
 ---  
 ## アナウンス  
 - note.comで記事を公開中です。  
-  [https://note.com/hajimetwi3/n/nf5467f5481ae](https://note.com/hajimetwi3/n/nf5467f5481ae)
+  [https://note.com/hajimetwi3/n/n5a3475a672c0](https://note.com/hajimetwi3/n/n5a3475a672c0)
 
 - Xでもアナウンスしています。  
   [https://x.com/hajimetwi3/status/2045759208130568283](https://x.com/hajimetwi3/status/2045759208130568283)
