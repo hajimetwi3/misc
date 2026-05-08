@@ -2,7 +2,7 @@
 
 All notable changes to Tsui keys will be documented in this file.
 
-## [1.1.0] - 2026-05-03
+## [1.1.0] - 2026-05-08
 
 ### Added
 
