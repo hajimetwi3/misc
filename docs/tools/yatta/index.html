@@ -21,16 +21,34 @@
 <style id="antiClickjack">html{display:none !important;}</style>
 <script>
   (function(){
-    if (self === top) {
-      var s = document.getElementById('antiClickjack');
-      if (s && s.parentNode) s.parentNode.removeChild(s);
-    } else {
-      try { top.location = self.location; } catch (e) {}
+    function lockHidden() {
+      try {
+        document.documentElement.style.setProperty('display', 'none', 'important');
+      } catch (e) {}
+    }
+    function wipe() {
+      lockHidden();
       try { document.documentElement.innerHTML = ''; } catch (e) {}
+      lockHidden();
+    }
+    if (self === top) {
+      try {
+        var s = document.getElementById('antiClickjack');
+        if (s && s.parentNode) s.parentNode.removeChild(s);
+      } catch (e) {}
+      return;
+    }
+    lockHidden();
+    try { top.location = self.location.href; } catch (e) {}
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', wipe, { once: true });
+      window.addEventListener('load', wipe, { once: true });
+    } else {
+      wipe();
     }
   })();
 </script>
-<title>やった？(ver1.0)</title>
+<title>やった？(ver1.1)</title>
 <style>
   :root {
     --bg: #fafaf9;
@@ -270,7 +288,7 @@
 <body>
 <div class="container">
   <header>
-    <h1>やった？<span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px">ver1.0</span></h1>
+    <h1>やった？<span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px">ver1.1</span></h1>
     <div class="date" id="today-date"></div>
   </header>
 
