@@ -17,7 +17,8 @@
 
 ※ よりセキュアな環境にするため、Webサイト版のURLに変更が入りました。ユーザーデータ自体には、影響ありません。新しい環境へご移行をお願いいたします。  
 新：https://tsuieditor.pages.dev/  
-旧：https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html（まだ少しの間、継続して稼働予定）  
+旧：https://hajimetwi3.github.io/misc/tools/tsui-editor/tsui-editor.html  
+　　（※旧版ももう少しの間、継続して稼働予定）    
 
 
 ## ライセンス  
