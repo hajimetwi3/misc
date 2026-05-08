@@ -2,6 +2,15 @@
 
 All notable changes to Tsui keys will be documented in this file.
 
+## [1.1.0] - 2026-05-03
+
+### Added
+
+- 英語UI追加
+- クリックジャッキングの対策強化
+
+詳細は [readme.md](readme.md) を参照してください。
+
 ## [1.0.1] - 2026-05-03
 
 ### Added
