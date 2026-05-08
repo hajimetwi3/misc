@@ -1,28 +1,68 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-build="github" translate="no">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#1a1a1a">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none';">
-<title>Tsui editor</title>
- 
-<!-- Clickjacking defense (frame-busting)  -->
+<!--
+═══════════════════════════════════════════════════════════════════
+  Tsui Editor
+═══════════════════════════════════════════════════════════════════
+
+  Name:        Tsui Editor
+  Author:      Hajime Tsui
+  Version:     1.1.0
+
+  ─── License ─────────────────────────────────────────────────────
+
+  MIT License — © 2026 Hajime Tsui
+
+═══════════════════════════════════════════════════════════════════
+-->
 <style id="antiClickjack">html{display:none !important;}</style>
-<script>
-(function(){
-  if (self === top) {
-    var s = document.getElementById('antiClickjack');
-    if (s && s.parentNode) s.parentNode.removeChild(s);
-  } else {
-    try { top.location = self.location; } catch (e) {}
-    try { document.documentElement.innerHTML = ''; } catch (e) {}
+<script>(function(){
+  function lockHidden() {
+    try {
+      document.documentElement.style.setProperty('display', 'none', 'important');
+    } catch (e) {}
   }
-})();
-</script>
- 
+
+  function wipe() {
+    lockHidden();
+    try { document.documentElement.innerHTML = ''; } catch (e) {}
+    lockHidden();
+  }
+
+  if (self === top) {
+    
+    try {
+      var s = document.getElementById('antiClickjack');
+      if (s && s.parentNode) s.parentNode.removeChild(s);
+    } catch (e) {}
+    return;
+  }
+
+  lockHidden();
+  try { top.location = self.location.href; } catch (e) {}
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wipe, { once: true });
+    window.addEventListener('load', wipe, { once: true });
+  } else {
+    wipe();
+  }
+})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Browser-based local file editor with tabs and tree. No login, no outbound traffic. / ブラウザでローカルファイルを編集するシンプルなエディタ。ログイン不要、データの外部送信無し。">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="google" content="notranslate">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; manifest-src 'self' data:; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none';">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22%231a1a1a%22%2F%3E%3Crect%20x%3D%22140%22%20y%3D%22140%22%20width%3D%22232%22%20height%3D%22232%22%20rx%3D%2216%22%20fill%3D%22none%22%20stroke%3D%22%237dd3c0%22%20stroke-width%3D%2216%22%2F%3E%3Cline%20x1%3D%22180%22%20y1%3D%22220%22%20x2%3D%22332%22%20y2%3D%22220%22%20stroke%3D%22%237dd3c0%22%20stroke-width%3D%2214%22%20stroke-linecap%3D%22round%22%2F%3E%3Cline%20x1%3D%22180%22%20y1%3D%22260%22%20x2%3D%22332%22%20y2%3D%22260%22%20stroke%3D%22%237dd3c0%22%20stroke-width%3D%2214%22%20stroke-linecap%3D%22round%22%2F%3E%3Cline%20x1%3D%22180%22%20y1%3D%22300%22%20x2%3D%22270%22%20y2%3D%22300%22%20stroke%3D%22%237dd3c0%22%20stroke-width%3D%2214%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" type="image/svg+xml">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Tsui%20Editor%22%2C%22short_name%22%3A%22Tsui%20Editor%22%2C%22description%22%3A%22Browser-based%20local%20file%20editor%20with%20tabs%20and%20tree.%20No%20login%2C%20no%20outbound%20traffic.%20%2F%20%E3%83%96%E3%83%A9%E3%82%A6%E3%82%B6%E3%81%A7%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92%E7%B7%A8%E9%9B%86%E3%81%99%E3%82%8B%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E3%81%AA%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF%E3%80%82%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E4%B8%8D%E8%A6%81%E3%80%81%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E5%A4%96%E9%83%A8%E9%80%81%E4%BF%A1%E7%84%A1%E3%81%97%E3%80%82%22%2C%22start_url%22%3A%22.%2F%22%2C%22scope%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231a1a1a%22%2C%22theme_color%22%3A%22%231a1a1a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMWExYTFhIi8%2BPHJlY3QgeD0iMTQwIiB5PSIxNDAiIHdpZHRoPSIyMzIiIGhlaWdodD0iMjMyIiByeD0iMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdkZDNjMCIgc3Ryb2tlLXdpZHRoPSIxNiIvPjxsaW5lIHgxPSIxODAiIHkxPSIyMjAiIHgyPSIzMzIiIHkyPSIyMjAiIHN0cm9rZT0iIzdkZDNjMCIgc3Ryb2tlLXdpZHRoPSIxNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8%2BPGxpbmUgeDE9IjE4MCIgeTE9IjI2MCIgeDI9IjMzMiIgeTI9IjI2MCIgc3Ryb2tlPSIjN2RkM2MwIiBzdHJva2Utd2lkdGg9IjE0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMTgwIiB5MT0iMzAwIiB4Mj0iMjcwIiB5Mj0iMzAwIiBzdHJva2U9IiM3ZGQzYzAiIHN0cm9rZS13aWR0aD0iMTQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg%3D%3D%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%5D%7D">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+.warn-spaced { margin-top: 10px; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --bg: #1a1a1a;
@@ -37,18 +77,16 @@
     --modified: #e8b842;
     --danger: #e57373;
     --tree-font-size: 12.5px;
-    --ui-font-delta: 0px;  /* Sys Font S=0px, M=+2px, L=+4px, XL=+7px */
+    --ui-font-delta: 0px;  
     --glow-color: transparent;
   }
 
-  /* Themes (calm = default, plus 5 neon variants) — Tsui Clock 互換パレット */
   html[data-theme="green"]  { --accent:#39ff77; --glow-color:#39ff77; }
   html[data-theme="amber"]  { --accent:#ffb000; --glow-color:#ffb000; }
   html[data-theme="red"]    { --accent:#ffc0b8; --glow-color:#ff2020; }
   html[data-theme="pink"]   { --accent:#ffc8f0; --glow-color:#ff26b3; }
   html[data-theme="cyber"]  { --accent:#B2FFCA; --glow-color:#39ff77; }
 
-  /* Glow: 静的な見出し系に限定 (編集中の active 要素には付けない) */
   html[data-theme] .title,
   html[data-theme] .modal-body h3,
   html[data-theme] .modal-body .app-name {
@@ -59,8 +97,8 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
     background: var(--bg);
     color: var(--fg);
-    height: 100vh;        /* フォールバック（超旧ブラウザ用） */
-    height: 100dvh;       /* モバイルブラウザのUI表示/非表示に追従 */
+    height: 100vh;        
+    height: 100dvh;       
     display: grid;
     grid-template-rows: auto 1fr auto;
     overflow: hidden;
@@ -177,7 +215,6 @@
     position: relative;
   }
 
-  /* ==== Sidebar settings ==== */
   .sidebar-settings {
     border-top: 1px solid var(--border);
     padding: 8px 10px;
@@ -264,7 +301,6 @@
     border-color: var(--accent);
   }
 
-  /* Wrap toggle (Wrap / Scroll) — tree-size-btn と同じ見た目、横幅は文字に合わせる */
   .wrap-btn {
     height: 24px;
     padding: 0 8px;
@@ -290,7 +326,6 @@
     border-color: var(--accent);
   }
 
-  /* Theme color dots — 6色をドットで並べる */
   .theme-dot {
     width: 18px;
     height: 18px;
@@ -353,7 +388,6 @@
     margin-left: 8px;
   }
 
-  /* ==== Tree ==== */
   .tree-node {
     padding: 3px 4px 3px 0;
     cursor: pointer;
@@ -380,7 +414,6 @@
 
   .tree-label { overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
 
-  /* 右端の⋮メニューボタン（デスクトップではホバー時のみ表示） */
   .tree-menu-btn {
     flex-shrink: 0;
     width: 22px;
@@ -449,7 +482,6 @@
     box-shadow: inset 0 0 0 2px var(--accent);
   }
 
-  /* ==== Editor area ==== */
   #editor-area { display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
   .tab-bar {
@@ -519,7 +551,6 @@
   }
   #editor:disabled { color: var(--fg-faint); }
 
-  /* Wrap mode (default ON) — 長い行をエディタ幅で折り返す */
   body.wrap-on #editor {
     white-space: pre-wrap;
     word-break: break-word;
@@ -616,7 +647,6 @@
   .context-item.danger:hover { background: rgba(229, 115, 115, 0.12); }
   .context-separator { height: 1px; background: var(--border); margin: 4px 2px; }
 
-  /* ==== Footer indicators ==== */
   .footer-pill {
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
     font-size: calc(10.5px + var(--ui-font-delta));
@@ -633,7 +663,6 @@
   .footer-pill:hover { color: var(--fg); border-color: var(--accent); }
   .footer-pill.readonly { color: var(--modified); border-color: var(--modified); }
 
-  /* ==== About button in sidebar ==== */
   .sidebar-about {
     border-top: 1px solid var(--border);
     padding: 7px 10px;
@@ -650,7 +679,6 @@
   }
   .sidebar-about:hover { color: var(--accent); background: var(--bg-hover); }
 
-  /* ==== Modal (About dialog) ==== */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -766,9 +794,8 @@
     margin-bottom: 2px;
   }
 
-  /* ==== Mobile ==== */
   @media (max-width: 768px) {
-    /* ヘッダー: タップ標的 min-height 44px、ボタン間隔を広めに */
+    
     header { padding: 8px 10px; gap: calc(10px + var(--ui-font-delta)); }
     .title { display: none; }
     header button {
@@ -800,11 +827,8 @@
     .tree-node-actions { display: flex; }
     .tree-action-btn { width: 26px; height: 22px; font-size: calc(11px + var(--ui-font-delta)); }
 
-    /* モバイルでは⋮を常時表示（タップ標的を明示） */
     .tree-menu-btn { opacity: 1; width: 32px; height: 32px; font-size: calc(18px + var(--ui-font-delta)); }
 
-    /* モバイルブラウザのURLバー／ナビバー／ホームインジケータで下端が
-       隠れないよう、ABOUT とフッターに安全余白を足す */
     .sidebar-about {
       padding-bottom: calc(7px + 3em + env(safe-area-inset-bottom, 0px));
     }
@@ -813,7 +837,6 @@
     }
   }
 
-  /* ==== Folder warning modal ================================================ */
   .warn-overlay {
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
     display: flex; align-items: center; justify-content: center;
@@ -844,61 +867,103 @@
   .warn-modal .warn-actions {
     display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;
   }
+
+.initially-hidden.initially-hidden { display: none; }
 </style>
+<title>Tsui Editor</title>
 </head>
 <body>
 <header>
-  <button id="btn-toggle-sidebar" class="sidebar-toggle" title="サイドバーの表示切替 (Ctrl+B)">☰</button>
-  <span class="title">TSUI EDITOR</span>
-  <span class="folder-path" id="folder-path">フォルダ未選択</span>
-  <button id="btn-reconnect" class="reconnect" style="display:none"></button>
-  <button id="btn-open" title="⚠ 選択したフォルダ配下に読み書き権限を持ちます。専用の作業フォルダを推奨します。">フォルダを開く</button>
-  <button id="btn-save" class="primary" disabled>保存</button>
+  <button id="btn-toggle-sidebar" class="sidebar-toggle"
+          data-i18n-attr="title=header.btn.toggleSidebar.title"
+          title="サイドバーの表示切替 (Ctrl+B)">☰</button>
+  <span class="title" data-i18n="app.brand">TSUI EDITOR</span>
+  <span class="folder-path" id="folder-path" data-i18n="header.folderPath.empty">フォルダ未選択</span>
+  <button id="btn-reconnect" class="reconnect initially-hidden"></button>
+  <button id="btn-open"
+          data-i18n="header.btn.openFolder"
+          data-i18n-attr="title=header.btn.openFolder.title"
+          title="⚠ 選択したフォルダ配下に読み書き権限を持ちます。専用の作業フォルダを推奨します。">フォルダを開く</button>
+  <button id="btn-save" class="primary" data-i18n="header.btn.save" disabled>保存</button>
+  <button id="btn-lang" title="Switch language / 言語切替">JA</button>
 </header>
 <main>
   <div id="sidebar-backdrop"></div>
   <aside id="sidebar">
-    <div class="sidebar-toolbar" id="sidebar-toolbar" style="display:none">
-      <button class="icon-btn" id="btn-new-file" title="新規ファイル (Ctrl+N)">＋ File</button>
-      <button class="icon-btn" id="btn-new-folder" title="新規フォルダ">＋ Folder</button>
-      <button class="icon-btn" id="btn-refresh" title="更新">⟳</button>
+    <div class="sidebar-toolbar initially-hidden" id="sidebar-toolbar">
+      <button class="icon-btn" id="btn-new-file"
+              data-i18n="sidebar.toolbar.newFile"
+              data-i18n-attr="title=sidebar.toolbar.newFile.title"
+              title="新規ファイル (Ctrl+N)">＋ File</button>
+      <button class="icon-btn" id="btn-new-folder"
+              data-i18n="sidebar.toolbar.newFolder"
+              data-i18n-attr="title=sidebar.toolbar.newFolder.title"
+              title="新規フォルダ">＋ Folder</button>
+      <button class="icon-btn" id="btn-refresh"
+              data-i18n-attr="title=sidebar.toolbar.refresh.title"
+              title="更新">⟳</button>
     </div>
     <div id="tree-container">
-      <div class="empty-state" id="sidebar-empty">
+      <div class="empty-state" id="sidebar-empty" data-i18n-html="sidebar.empty">
         「フォルダを開く」を押して<br>作業フォルダを選択してください
       </div>
     </div>
     <div class="sidebar-settings">
-      <span class="settings-label">Font</span>
-      <button class="font-btn" id="btn-font-dec" title="フォント縮小">−</button>
+      <span class="settings-label" data-i18n="sidebar.settings.font.label">Font</span>
+      <button class="font-btn" id="btn-font-dec"
+              data-i18n-attr="title=sidebar.settings.font.dec.title"
+              title="フォント縮小">−</button>
       <span id="font-size-display">13px</span>
-      <button class="font-btn" id="btn-font-inc" title="フォント拡大">＋</button>
-      <span class="settings-reset" id="btn-font-reset" title="リセット">reset</span>
+      <button class="font-btn" id="btn-font-inc"
+              data-i18n-attr="title=sidebar.settings.font.inc.title"
+              title="フォント拡大">＋</button>
+      <span class="settings-reset" id="btn-font-reset"
+            data-i18n="sidebar.settings.font.reset"
+            data-i18n-attr="title=sidebar.settings.font.reset.title"
+            title="リセット">reset</span>
     </div>
     <div class="sidebar-settings">
-      <span class="settings-label">Wrap</span>
-      <button class="wrap-btn" data-wrap="on" title="長い行をエディタ幅で折り返す">Wrap</button>
-      <button class="wrap-btn" data-wrap="off" title="折り返さず横スクロール">Scroll</button>
+      <span class="settings-label" data-i18n="sidebar.settings.wrap.label">Wrap</span>
+      <button class="wrap-btn" data-wrap="on"
+              data-i18n="sidebar.settings.wrap.on"
+              data-i18n-attr="title=sidebar.settings.wrap.on.title"
+              title="長い行をエディタ幅で折り返す">Wrap</button>
+      <button class="wrap-btn" data-wrap="off"
+              data-i18n="sidebar.settings.wrap.off"
+              data-i18n-attr="title=sidebar.settings.wrap.off.title"
+              title="折り返さず横スクロール">Scroll</button>
     </div>
     <div class="sidebar-settings">
-      <span class="settings-label">Sys Font</span>
-      <button class="tree-size-btn" data-size="s" title="小 (12.5px)">S</button>
-      <button class="tree-size-btn" data-size="m" title="中 (17.5px)">M</button>
-      <button class="tree-size-btn" data-size="l" title="大 (20px)">L</button>
-      <button class="tree-size-btn" data-size="xl" title="特大 (23px)">XL</button>
+      <span class="settings-label" data-i18n="sidebar.settings.sysFont.label">Sys Font</span>
+      <button class="tree-size-btn" data-size="s"
+              data-i18n-attr="title=sidebar.settings.sysFont.s.title"
+              title="小 (12.5px)">S</button>
+      <button class="tree-size-btn" data-size="m"
+              data-i18n-attr="title=sidebar.settings.sysFont.m.title"
+              title="中 (17.5px)">M</button>
+      <button class="tree-size-btn" data-size="l"
+              data-i18n-attr="title=sidebar.settings.sysFont.l.title"
+              title="大 (20px)">L</button>
+      <button class="tree-size-btn" data-size="xl"
+              data-i18n-attr="title=sidebar.settings.sysFont.xl.title"
+              title="特大 (23px)">XL</button>
     </div>
     <div class="sidebar-settings">
-      <span class="settings-label">Theme</span>
-      <button class="theme-dot" data-theme="calm" title="calm (default)"></button>
+      <span class="settings-label" data-i18n="sidebar.settings.theme.label">Theme</span>
+      <button class="theme-dot" data-theme="calm"
+              data-i18n-attr="title=sidebar.settings.theme.calm.title"
+              title="calm (default)"></button>
       <button class="theme-dot" data-theme="green" title="green"></button>
       <button class="theme-dot" data-theme="amber" title="amber"></button>
       <button class="theme-dot" data-theme="red" title="red"></button>
       <button class="theme-dot" data-theme="pink" title="pink"></button>
       <button class="theme-dot" data-theme="cyber" title="cyber"></button>
     </div>
-    <div class="sidebar-about" id="btn-about" title="このアプリについて">
+    <div class="sidebar-about" id="btn-about"
+         data-i18n-attr="title=sidebar.about.title"
+         title="このアプリについて">
       <span>ABOUT</span>
-      <span>v1.0.0</span>
+      <span>v1.1.0</span>
     </div>
   </aside>
   <section id="editor-area">
@@ -906,8 +971,8 @@
     <div class="editor-wrap">
       <textarea id="editor" disabled spellcheck="false"></textarea>
       <div class="editor-empty" id="editor-empty">
-        <div class="title-large">ファイルが選択されていません</div>
-        <div class="hint">
+        <div class="title-large" data-i18n="editor.empty.title">ファイルが選択されていません</div>
+        <div class="hint" data-i18n-html="editor.empty.hint">
           左のファイルツリーからファイルを選択<br>
           もしくは「フォルダを開く」で作業を開始
         </div>
@@ -917,43 +982,48 @@
 </main>
 <footer>
   <span id="status-info"></span>
-  <span class="footer-pill" id="pill-readonly" style="display:none">READONLY</span>
-  <span class="footer-pill" id="pill-encoding" style="display:none" title="文字エンコーディング (クリックで変更)">UTF-8</span>
-  <span class="footer-pill" id="pill-eol" style="display:none" title="改行コード (クリックで変換)">LF</span>
-  <span class="footer-hint">保存 <span class="kbd">Ctrl</span>+<span class="kbd">S</span> · タブ閉 <span class="kbd">Ctrl</span>+<span class="kbd">W</span> · サイドバー <span class="kbd">Ctrl</span>+<span class="kbd">B</span></span>
+  <span class="footer-pill initially-hidden" id="pill-readonly">READONLY</span>
+  <span class="footer-pill initially-hidden" id="pill-encoding"
+        data-i18n-attr="title=footer.pill.encoding.title"
+        title="文字エンコーディング (クリックで変更)">UTF-8</span>
+  <span class="footer-pill initially-hidden" id="pill-eol"
+        data-i18n-attr="title=footer.pill.eol.title"
+        title="改行コード (クリックで変換)">LF</span>
+  <span class="footer-hint"><span data-i18n="footer.hint.save">保存</span> <span class="kbd">Ctrl</span>+<span class="kbd">S</span> · <span data-i18n="footer.hint.tabClose">タブ閉</span> <span class="kbd">Ctrl</span>+<span class="kbd">W</span> · <span data-i18n="footer.hint.sidebar">サイドバー</span> <span class="kbd">Ctrl</span>+<span class="kbd">B</span></span>
 </footer>
 <div class="context-menu" id="context-menu"></div>
 
-<!-- About Modal -->
 <div class="modal-backdrop" id="modal-about">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">About</span>
-      <button class="modal-close" id="btn-modal-close" title="閉じる">×</button>
+      <span class="modal-title" data-i18n="about.modalTitle">About</span>
+      <button class="modal-close" id="btn-modal-close"
+              data-i18n-attr="title=about.close"
+              title="閉じる">×</button>
     </div>
     <div class="modal-body">
       <div class="app-name">Tsui Editor</div>
-      <div class="version-line">Version 1.0.0</div>
+      <div class="version-line">Version 1.1.0</div>
 
-      <h3>About</h3>
-      <p><strong>Tsui Editor</strong> はブラウザで動くローカルファイルエディタです。File System Access API でフォルダまるごと読み書き、タブ・ツリーで操作。ログイン不要、インストール不要、データの外部送信なし。<br>
+      <h3 data-i18n="about.section.about">About</h3>
+      <p data-i18n-html="about.section.about.body"><strong>Tsui Editor</strong> はブラウザで動くローカルファイルエディタです。File System Access API でフォルダまるごと読み書き、タブ・ツリーで操作。ログイン不要、インストール不要、データの外部送信なし。<br>
         — <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">詳細</a> —</p>
 
-      <h3>Privacy</h3>
-      <p>ファイルや入力内容は、本アプリ本体から外部送信されません。CSP の <code>connect-src 'none'</code> により、<code>fetch</code> 等のネットワーク送信はブラウザレベルで禁止されています。DevTools の Network タブで確認いただけます。</p>
-      <p>ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。</p>
-      <p>本アプリ本体には計測機能は一切含まれていません（上記 CSP により外部送信が禁止されているため）。</p>
-      <p>一方、作者プロフィールや Tsui series のランディングページ等の情報ページでは、訪問数の把握に Cloudflare Web Analytics を利用しています（Cookie なし / フィンガープリントなし / クロスサイトトラッキングなし）。</p>
-      <p>なお、別途プラットフォーム側（配信元サーバや中継事業者等）で計測・記録されている可能性はあります。</p>
+      <h3 data-i18n="about.section.privacy">Privacy</h3>
+      <p data-i18n-html="about.section.privacy.p1">ファイルや入力内容は、本アプリ本体から外部送信されません。CSP の <code>connect-src 'none'</code> により、<code>fetch</code> 等のネットワーク送信はブラウザレベルで禁止されています。DevTools の Network タブで確認いただけます。</p>
+      <p data-i18n-html="about.section.privacy.p2">ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme・Lang）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。</p>
+      <p data-i18n-html="about.section.privacy.p3">本アプリ本体には計測機能は一切含まれていません（上記 CSP により外部送信が禁止されているため）。</p>
+      <p data-i18n="about.section.privacy.p4">一方、作者プロフィールや Tsui series のランディングページ等の情報ページでは、訪問数の把握に Cloudflare Web Analytics を利用しています（Cookie なし / フィンガープリントなし / クロスサイトトラッキングなし）。</p>
+      <p data-i18n="about.section.privacy.p5">なお、別途プラットフォーム側（配信元サーバや中継事業者等）で計測・記録されている可能性はあります。</p>
 
-      <h3>注意</h3>
-      <p>File System API の仕様上、選択したフォルダ配下への読み書き・削除権限を持ちます。重要フォルダや同期フォルダではなく、専用の作業フォルダで利用することを推奨します。</p>
+      <h3 data-i18n="about.section.notice">注意</h3>
+      <p data-i18n="about.section.notice.body">File System API の仕様上、選択したフォルダ配下への読み書き・削除権限を持ちます。重要フォルダや同期フォルダではなく、専用の作業フォルダで利用することを推奨します。</p>
 
-      <h3>Disclaimer</h3>
-      <p>本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。ご利用は自己責任にてお願いします。ファイルのバックアップは利用者の責任で行ってください。</p>
+      <h3 data-i18n="about.section.disclaimer">Disclaimer</h3>
+      <p data-i18n="about.section.disclaimer.body">本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。ご利用は自己責任にてお願いします。ファイルのバックアップは利用者の責任で行ってください。</p>
 
-      <h3>License (This App)</h3>
-      <div class="author-line">Copyright (c) 2026 <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener noreferrer">Hajime Tsui</a></div>
+      <h3 data-i18n="about.section.license">License (This App)</h3>
+      <div class="author-line" data-i18n-html="about.section.license.copyright">Copyright (c) 2026 <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener noreferrer">Hajime Tsui</a></div>
       <div class="license-text">MIT License
 
 Copyright (c) 2026 Hajime Tsui
@@ -964,27 +1034,415 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</div>
 
-      <h3>Related</h3>
-      <p>本アプリは <a href="https://hajimetwi3.github.io/hajimetwi3/Tsui-series/" target="_blank" rel="noopener noreferrer">Tsui series</a>（静かな道具たち）の一つです。</p>
-      <p>GitHub: <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">github.com/hajimetwi3/misc</a></p>
+      <h3 data-i18n="about.section.related">Related</h3>
+      <p data-i18n-html="about.section.related.series">本アプリは <a href="https://hajimetwi3.github.io/hajimetwi3/Tsui-series/" target="_blank" rel="noopener noreferrer">Tsui series</a>（静かな道具たち）の一つです。</p>
+      <p data-i18n-html="about.section.related.github">GitHub: <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">github.com/hajimetwi3/misc</a></p>
     </div>
   </div>
 </div>
 
 <script>
-// ==== Browser support check =================================================
+
+const VALID_LANGS = ['ja', 'en'];
+const DEFAULT_LANG = 'ja';
+const LANG_KEY = 'tsui-editor-lang';
+
+const I18N_DICT = {
+  ja: {
+    
+    'app.brand': 'TSUI EDITOR',
+    'header.btn.toggleSidebar.title': 'サイドバーの表示切替 (Ctrl+B)',
+    'header.btn.openFolder': 'フォルダを開く',
+    'header.btn.openFolder.title': '⚠ 選択したフォルダ配下に読み書き権限を持ちます。専用の作業フォルダを推奨します。',
+    'header.btn.save': '保存',
+    'header.btn.lang.title.toEn': 'Switch to English',
+    'header.btn.lang.title.toJa': '日本語に切替',
+    'header.folderPath.empty': 'フォルダ未選択',
+    'header.btn.reconnect.prefix': '↻ 前回: {name}',
+
+    'sidebar.empty': '「フォルダを開く」を押して<br>作業フォルダを選択してください',
+    'sidebar.toolbar.newFile': '＋ File',
+    'sidebar.toolbar.newFile.title': '新規ファイル (Ctrl+N)',
+    'sidebar.toolbar.newFolder': '＋ Folder',
+    'sidebar.toolbar.newFolder.title': '新規フォルダ',
+    'sidebar.toolbar.refresh.title': '更新',
+
+    'sidebar.settings.font.label': 'Font',
+    'sidebar.settings.font.dec.title': 'フォント縮小',
+    'sidebar.settings.font.inc.title': 'フォント拡大',
+    'sidebar.settings.font.reset': 'reset',
+    'sidebar.settings.font.reset.title': 'リセット',
+
+    'sidebar.settings.wrap.label': 'Wrap',
+    'sidebar.settings.wrap.on': 'Wrap',
+    'sidebar.settings.wrap.on.title': '長い行をエディタ幅で折り返す',
+    'sidebar.settings.wrap.off': 'Scroll',
+    'sidebar.settings.wrap.off.title': '折り返さず横スクロール',
+
+    'sidebar.settings.sysFont.label': 'Sys Font',
+    'sidebar.settings.sysFont.s.title': '小 (12.5px)',
+    'sidebar.settings.sysFont.m.title': '中 (17.5px)',
+    'sidebar.settings.sysFont.l.title': '大 (20px)',
+    'sidebar.settings.sysFont.xl.title': '特大 (23px)',
+
+    'sidebar.settings.theme.label': 'Theme',
+    'sidebar.settings.theme.calm.title': 'calm (default)',
+
+    'sidebar.about.title': 'このアプリについて',
+
+    'editor.empty.title': 'ファイルが選択されていません',
+    'editor.empty.hint': '左のファイルツリーからファイルを選択<br>もしくは「フォルダを開く」で作業を開始',
+
+    'footer.pill.encoding.title': '文字エンコーディング (クリックで変更)',
+    'footer.pill.eol.title': '改行コード (クリックで変換)',
+    'footer.hint.save': '保存',
+    'footer.hint.tabClose': 'タブ閉',
+    'footer.hint.sidebar': 'サイドバー',
+
+    'about.modalTitle': 'About',
+    'about.close': '閉じる',
+    'about.section.about': 'About',
+    'about.section.about.body': '<strong>Tsui Editor</strong> はブラウザで動くローカルファイルエディタです。File System Access API でフォルダまるごと読み書き、タブ・ツリーで操作。ログイン不要、インストール不要、データの外部送信なし。<br>— <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">詳細</a> —',
+    'about.section.privacy': 'Privacy',
+    'about.section.privacy.p1': 'ファイルや入力内容は、本アプリ本体から外部送信されません。CSP の <code>connect-src \'none\'</code> により、<code>fetch</code> 等のネットワーク送信はブラウザレベルで禁止されています。DevTools の Network タブで確認いただけます。',
+    'about.section.privacy.p2': 'ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme・Lang）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。',
+    'about.section.privacy.p3': '本アプリ本体には計測機能は一切含まれていません（上記 CSP により外部送信が禁止されているため）。',
+    'about.section.privacy.p4': '一方、作者プロフィールや Tsui series のランディングページ等の情報ページでは、訪問数の把握に Cloudflare Web Analytics を利用しています（Cookie なし / フィンガープリントなし / クロスサイトトラッキングなし）。',
+    'about.section.privacy.p5': 'なお、別途プラットフォーム側（配信元サーバや中継事業者等）で計測・記録されている可能性はあります。',
+    'about.section.notice': '注意',
+    'about.section.notice.body': 'File System API の仕様上、選択したフォルダ配下への読み書き・削除権限を持ちます。重要フォルダや同期フォルダではなく、専用の作業フォルダで利用することを推奨します。',
+    'about.section.disclaimer': 'Disclaimer',
+    'about.section.disclaimer.body': '本アプリは現状有姿で提供され、動作の正確性・可用性について一切の保証はありません。ご利用は自己責任にてお願いします。ファイルのバックアップは利用者の責任で行ってください。',
+    'about.section.license': 'License (This App)',
+    'about.section.license.copyright': 'Copyright (c) 2026 <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener noreferrer">Hajime Tsui</a>',
+    'about.section.related': 'Related',
+    'about.section.related.series': '本アプリは <a href="https://hajimetwi3.github.io/hajimetwi3/Tsui-series/" target="_blank" rel="noopener noreferrer">Tsui series</a>（静かな道具たち）の一つです。',
+    'about.section.related.github': 'GitHub: <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">github.com/hajimetwi3/misc</a>',
+
+    'warn.title': '⚠ 権限に関する重要な注意',
+    'warn.p1': 'このアプリは、選択したフォルダ配下の<b>すべてのファイルに対して読み書き・削除の権限</b>を持ちます。',
+    'warn.p2': '<b>以下のような、システム的・個人的に重要なフォルダの選択は避けてください</b>：',
+    'warn.li1': '<code>C:\\</code> / <code>/</code> などルート直下',
+    'warn.li2': 'Desktop / Documents / Downloads',
+    'warn.li3': 'OneDrive / iCloud / Dropbox の同期フォルダ',
+    'warn.li4': 'Git リポジトリや開発プロジェクトのルート',
+    'warn.recommended': '推奨は、このエディタ専用に作った作業フォルダ（例: <code>C:\\tsui-workspace\\</code>）です。',
+    'warn.note': 'この警告は初回のみ表示されます。',
+    'warn.btn.cancel': 'キャンセル',
+    'warn.btn.ok': '理解した上で開く',
+
+    'status.charSuffix': '文字',
+    'flash.saved': '保存しました',
+    'flash.move': '移動: {name}',
+    'flash.reload': '{encoding} で再読込',
+    'flash.editable': '書き込み可能にしました',
+
+    'tree.menuBtn.title': 'メニュー',
+    'tree.menuBtn.aria': 'メニュー',
+    'tree.action.newFile.title': 'このフォルダに新規ファイル',
+    'tree.action.newFolder.title': 'このフォルダに新規フォルダ',
+
+    'ctx.heading.reload': '── 再読込 ──',
+    'ctx.heading.changeSaveFormat': '── 保存時の形式を変更 ──',
+    'ctx.encoding.utf8.reload': 'UTF-8 で再読込',
+    'ctx.encoding.utf8Bom.reload': 'UTF-8 BOM で再読込',
+    'ctx.encoding.shiftJis.reload': 'Shift_JIS で再読込',
+    'ctx.encoding.eucJp.reload': 'EUC-JP で再読込',
+    'ctx.encoding.utf16le.reload': 'UTF-16LE で再読込',
+    'ctx.encoding.utf8.set': 'UTF-8 (BOM無し) にする',
+    'ctx.encoding.utf8Bom.set': 'UTF-8 BOM にする',
+    'ctx.encoding.utf16leBom.set': 'UTF-16LE BOM にする',
+    'ctx.eol.lf': 'LF (Unix/macOS)',
+    'ctx.eol.crlf': 'CRLF (Windows)',
+    'ctx.eol.cr': 'CR (旧Mac)',
+    'ctx.action.newFile': '＋ 新規ファイル',
+    'ctx.action.newFolder': '＋ 新規フォルダ',
+    'ctx.action.rename': '名前変更',
+    'ctx.action.delete': '削除',
+
+    'prompt.fileName': 'ファイル名:',
+    'prompt.folderName': 'フォルダ名:',
+    'prompt.newFileTitle': '新規ファイル名:',
+    'prompt.newFolderTitle': '新規フォルダ名:',
+    'prompt.fileAt': '「{path}」に作成するファイル名:',
+    'prompt.folderAt': '「{path}」に作成するフォルダ名:',
+    'prompt.default.untitled': 'untitled.txt',
+    'prompt.default.newFolder': 'new-folder',
+
+    'confirm.discardOpenFolder': '未保存のタブがあります。破棄して別フォルダを開きますか？',
+    'confirm.binaryFile': '「{name}」はバイナリの可能性があります。それでも開きますか？',
+    'confirm.sizeReadonly': '大きなファイルです ({size})。\n読み取り専用で開きます。続行しますか？',
+    'confirm.sizeWarn': '大きめのファイルです ({size})。\n動作が重くなる可能性があります。開きますか？',
+    'confirm.tabCloseDirty': '「{path}」の変更は保存されていません。破棄しますか？',
+    'confirm.encodingFallback': '{encoding} での保存はこのアプリでは非対応のため、UTF-8 で保存します。\n(以降、この形式で保存されます)',
+    'confirm.reloadDirty': '未保存の変更があります。破棄して再読込しますか？',
+    'confirm.decodeFailed': '{encoding} として正しくデコードできませんでした。\nこのエンコーディングではないファイルの可能性があります。\n\n文字化けする可能性がありますが、それでも読み込みますか？',
+    'confirm.releaseReadonly': '読み取り専用を解除します。大きなファイルの編集は動作が重くなる可能性があります。続行しますか？',
+    'confirm.moveOverwrite': '移動先に「{name}」が既に存在します。上書きしますか？',
+    'confirm.deleteDir': '「{path}」を削除しますか？(中身ごと)',
+    'confirm.deleteFile': '「{path}」を削除しますか？',
+    'confirm.renameOverwrite': '「{name}」は既に存在します。上書きしますか？',
+    'confirm.popstateDiscard': '未保存のタブがあります。破棄して閉じますか？',
+
+    'alert.permNotGranted': '権限が得られませんでした',
+    'alert.openFolderFailed': 'フォルダを開けませんでした: {msg}',
+    'alert.cantMoveToSelfOrChild': '自分自身または子孫には移動できません',
+    'alert.dupExistsAtDest.dir': '移動先に同名のフォルダが既に存在します',
+    'alert.dupExistsAtDest.file': '移動先に同名のファイルが既に存在します',
+    'alert.cantMoveDir': 'このブラウザではフォルダの移動に対応していません (ファイルなら可能)',
+    'alert.moveFailed': '移動に失敗: {msg}',
+    'alert.fileTooLarge': 'ファイルサイズが大きすぎます ({size} ≥ {limit})。\nこのアプリでは開けません。',
+    'alert.openFileFailed': 'ファイルを開けませんでした: {msg}',
+    'alert.saveFailed': '保存に失敗しました: {msg}',
+    'alert.permWriteDenied': '書き込み権限がありません',
+    'alert.reloadFailed': '再読込に失敗: {msg}',
+    'alert.alreadyExists.dir': '「{name}」は既に存在します（フォルダ）。別の名前を指定してください。',
+    'alert.alreadyExists.file': '「{name}」は既に存在します（ファイル）。別の名前を指定してください。',
+    'alert.createFileFailed': 'ファイル作成に失敗: {msg}',
+    'alert.createFolderFailed': 'フォルダ作成に失敗: {msg}',
+    'alert.deleteFailed': '削除に失敗: {msg}',
+    'alert.invalidName': '名前に / や \\ は使えません',
+    'alert.dirRenameNotSupported': 'このブラウザではディレクトリのリネームに対応していません',
+    'alert.renameFailed': 'リネームに失敗: {msg}',
+    'alert.treeReadError': '読込エラー: {msg}'
+  },
+
+  en: {
+    
+    'app.brand': 'TSUI EDITOR',
+    'header.btn.toggleSidebar.title': 'Toggle sidebar (Ctrl+B)',
+    'header.btn.openFolder': 'Open folder',
+    'header.btn.openFolder.title': '⚠ This app gets read/write permission for the entire selected folder. A dedicated workspace folder is recommended.',
+    'header.btn.save': 'Save',
+    'header.btn.lang.title.toEn': 'Switch to English',
+    'header.btn.lang.title.toJa': '日本語に切替',
+    'header.folderPath.empty': 'No folder selected',
+    'header.btn.reconnect.prefix': '↻ Last: {name}',
+
+    'sidebar.empty': 'Click "Open folder"<br>to select a workspace folder',
+    'sidebar.toolbar.newFile': '＋ File',
+    'sidebar.toolbar.newFile.title': 'New file (Ctrl+N)',
+    'sidebar.toolbar.newFolder': '＋ Folder',
+    'sidebar.toolbar.newFolder.title': 'New folder',
+    'sidebar.toolbar.refresh.title': 'Refresh',
+
+    'sidebar.settings.font.label': 'Font',
+    'sidebar.settings.font.dec.title': 'Decrease font size',
+    'sidebar.settings.font.inc.title': 'Increase font size',
+    'sidebar.settings.font.reset': 'reset',
+    'sidebar.settings.font.reset.title': 'Reset',
+
+    'sidebar.settings.wrap.label': 'Wrap',
+    'sidebar.settings.wrap.on': 'Wrap',
+    'sidebar.settings.wrap.on.title': 'Wrap long lines at editor width',
+    'sidebar.settings.wrap.off': 'Scroll',
+    'sidebar.settings.wrap.off.title': 'Do not wrap; scroll horizontally',
+
+    'sidebar.settings.sysFont.label': 'Sys Font',
+    'sidebar.settings.sysFont.s.title': 'Small (12.5px)',
+    'sidebar.settings.sysFont.m.title': 'Medium (17.5px)',
+    'sidebar.settings.sysFont.l.title': 'Large (20px)',
+    'sidebar.settings.sysFont.xl.title': 'Extra large (23px)',
+
+    'sidebar.settings.theme.label': 'Theme',
+    'sidebar.settings.theme.calm.title': 'calm (default)',
+
+    'sidebar.about.title': 'About this app',
+
+    'editor.empty.title': 'No file selected',
+    'editor.empty.hint': 'Choose a file from the tree on the left,<br>or click "Open folder" to start.',
+
+    'footer.pill.encoding.title': 'Character encoding (click to change)',
+    'footer.pill.eol.title': 'Line endings (click to convert)',
+    'footer.hint.save': 'Save',
+    'footer.hint.tabClose': 'Close tab',
+    'footer.hint.sidebar': 'Sidebar',
+
+    'about.modalTitle': 'About',
+    'about.close': 'Close',
+    'about.section.about': 'About',
+    'about.section.about.body': '<strong>Tsui Editor</strong> is a browser-based local file editor. It uses the File System Access API to read and write entire folders, with tab and tree navigation. No login, no install, no outbound traffic.<br>— <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">Details</a> —',
+    'about.section.privacy': 'Privacy',
+    'about.section.privacy.p1': 'Files and editor input are not sent outside this app. The CSP <code>connect-src \'none\'</code> directive blocks <code>fetch</code> and other network requests at the browser level. You can verify this in the DevTools Network tab.',
+    'about.section.privacy.p2': 'Files and editor input themselves are not stored in <code>localStorage</code> or <code>IndexedDB</code>. They live only inside the folder you selected via the File System Access API. UI preferences (font size, wrap, Sys Font, Theme, Lang) are stored in <code>localStorage</code>, and a handle for reconnecting to the previous folder is stored in <code>IndexedDB</code>.',
+    'about.section.privacy.p3': 'This app itself contains no analytics (the CSP above blocks any outbound traffic).',
+    'about.section.privacy.p4': 'Information pages such as the author profile and the Tsui series landing page do use Cloudflare Web Analytics for visit counts (no cookies, no fingerprinting, no cross-site tracking).',
+    'about.section.privacy.p5': 'Note that the platform itself (hosting provider, intermediaries, etc.) may also log requests independently.',
+    'about.section.notice': 'Notice',
+    'about.section.notice.body': 'By design of the File System API, the app holds read/write/delete permission for everything under the selected folder. Use a dedicated workspace folder rather than important folders or sync folders.',
+    'about.section.disclaimer': 'Disclaimer',
+    'about.section.disclaimer.body': 'This app is provided AS IS, with no warranty of correctness or availability. Use at your own risk. Backing up your files is your responsibility.',
+    'about.section.license': 'License (This App)',
+    'about.section.license.copyright': 'Copyright (c) 2026 <a href="https://hajimetwi3.github.io/hajimetwi3/" target="_blank" rel="noopener noreferrer">Hajime Tsui</a>',
+    'about.section.related': 'Related',
+    'about.section.related.series': 'This app is part of <a href="https://hajimetwi3.github.io/hajimetwi3/Tsui-series/" target="_blank" rel="noopener noreferrer">Tsui series</a> (quiet tools).',
+    'about.section.related.github': 'GitHub: <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">github.com/hajimetwi3/misc</a>',
+
+    'warn.title': '⚠ Important notice on permissions',
+    'warn.p1': 'This app holds <b>read, write, and delete permission for every file under the selected folder</b>.',
+    'warn.p2': '<b>Avoid selecting folders that are critical to your system or personal data</b>, such as:',
+    'warn.li1': 'Filesystem roots like <code>C:\\</code> or <code>/</code>',
+    'warn.li2': 'Desktop / Documents / Downloads',
+    'warn.li3': 'OneDrive / iCloud / Dropbox sync folders',
+    'warn.li4': 'Git repositories or development project roots',
+    'warn.recommended': 'Recommended: a dedicated workspace folder for this editor (e.g., <code>C:\\tsui-workspace\\</code>).',
+    'warn.note': 'This warning is shown only on first use.',
+    'warn.btn.cancel': 'Cancel',
+    'warn.btn.ok': 'I understand; open',
+
+    'status.charSuffix': 'chars',
+    'flash.saved': 'Saved',
+    'flash.move': 'Moved: {name}',
+    'flash.reload': 'Reloaded as {encoding}',
+    'flash.editable': 'Made writable',
+
+    'tree.menuBtn.title': 'Menu',
+    'tree.menuBtn.aria': 'Menu',
+    'tree.action.newFile.title': 'New file in this folder',
+    'tree.action.newFolder.title': 'New folder in this folder',
+
+    'ctx.heading.reload': '── Reload as ──',
+    'ctx.heading.changeSaveFormat': '── Change save format ──',
+    'ctx.encoding.utf8.reload': 'Reload as UTF-8',
+    'ctx.encoding.utf8Bom.reload': 'Reload as UTF-8 BOM',
+    'ctx.encoding.shiftJis.reload': 'Reload as Shift_JIS',
+    'ctx.encoding.eucJp.reload': 'Reload as EUC-JP',
+    'ctx.encoding.utf16le.reload': 'Reload as UTF-16LE',
+    'ctx.encoding.utf8.set': 'Save as UTF-8 (no BOM)',
+    'ctx.encoding.utf8Bom.set': 'Save as UTF-8 BOM',
+    'ctx.encoding.utf16leBom.set': 'Save as UTF-16LE BOM',
+    'ctx.eol.lf': 'LF (Unix/macOS)',
+    'ctx.eol.crlf': 'CRLF (Windows)',
+    'ctx.eol.cr': 'CR (classic Mac)',
+    'ctx.action.newFile': '＋ New file',
+    'ctx.action.newFolder': '＋ New folder',
+    'ctx.action.rename': 'Rename',
+    'ctx.action.delete': 'Delete',
+
+    'prompt.fileName': 'File name:',
+    'prompt.folderName': 'Folder name:',
+    'prompt.newFileTitle': 'New file name:',
+    'prompt.newFolderTitle': 'New folder name:',
+    'prompt.fileAt': 'New file name in "{path}":',
+    'prompt.folderAt': 'New folder name in "{path}":',
+    'prompt.default.untitled': 'untitled.txt',
+    'prompt.default.newFolder': 'new-folder',
+
+    'confirm.discardOpenFolder': 'You have unsaved tabs. Discard them and open another folder?',
+    'confirm.binaryFile': '"{name}" may be a binary file. Open anyway?',
+    'confirm.sizeReadonly': 'Large file ({size}).\nIt will be opened read-only. Continue?',
+    'confirm.sizeWarn': 'Fairly large file ({size}).\nThis may slow things down. Open it?',
+    'confirm.tabCloseDirty': 'Changes to "{path}" are not saved. Discard them?',
+    'confirm.encodingFallback': 'Saving as {encoding} is not supported by this app, so it will be saved as UTF-8.\n(Future saves of this file will use UTF-8.)',
+    'confirm.reloadDirty': 'There are unsaved changes. Discard them and reload?',
+    'confirm.decodeFailed': 'Could not decode as {encoding}.\nThe file may not actually be in this encoding.\n\nLoad it anyway? Some characters may be replaced.',
+    'confirm.releaseReadonly': 'Disable read-only mode? Editing very large files may be slow. Continue?',
+    'confirm.moveOverwrite': '"{name}" already exists at the destination. Overwrite?',
+    'confirm.deleteDir': 'Delete "{path}" and all its contents?',
+    'confirm.deleteFile': 'Delete "{path}"?',
+    'confirm.renameOverwrite': '"{name}" already exists. Overwrite?',
+    'confirm.popstateDiscard': 'You have unsaved tabs. Discard them and leave?',
+
+    'alert.permNotGranted': 'Permission was not granted',
+    'alert.openFolderFailed': 'Could not open folder: {msg}',
+    'alert.cantMoveToSelfOrChild': 'Cannot move into itself or its descendants',
+    'alert.dupExistsAtDest.dir': 'A folder with the same name already exists at the destination',
+    'alert.dupExistsAtDest.file': 'A file with the same name already exists at the destination',
+    'alert.cantMoveDir': 'This browser does not support moving folders (files only)',
+    'alert.moveFailed': 'Move failed: {msg}',
+    'alert.fileTooLarge': 'File is too large ({size} ≥ {limit}).\nThis app cannot open it.',
+    'alert.openFileFailed': 'Could not open file: {msg}',
+    'alert.saveFailed': 'Save failed: {msg}',
+    'alert.permWriteDenied': 'Write permission denied',
+    'alert.reloadFailed': 'Reload failed: {msg}',
+    'alert.alreadyExists.dir': 'A folder named "{name}" already exists. Choose another name.',
+    'alert.alreadyExists.file': 'A file named "{name}" already exists. Choose another name.',
+    'alert.createFileFailed': 'Failed to create file: {msg}',
+    'alert.createFolderFailed': 'Failed to create folder: {msg}',
+    'alert.deleteFailed': 'Delete failed: {msg}',
+    'alert.invalidName': 'Names cannot contain / or \\',
+    'alert.dirRenameNotSupported': 'This browser does not support renaming directories',
+    'alert.renameFailed': 'Rename failed: {msg}',
+    'alert.treeReadError': 'Read error: {msg}'
+  }
+};
+
+function detectInitialLang() {
+  try {
+    const nav = (navigator.language || navigator.userLanguage || 'ja').toLowerCase();
+    if (nav.startsWith('ja')) return 'ja';
+    return 'en';
+  } catch {
+    return 'ja';
+  }
+}
+
+let currentLang = (() => {
+  try {
+    const v = localStorage.getItem(LANG_KEY);
+    if (VALID_LANGS.includes(v)) return v;
+  } catch {}
+  return detectInitialLang();
+})();
+
+function setLang(lang) {
+  if (!VALID_LANGS.includes(lang)) return false;
+  currentLang = lang;
+  return true;
+}
+function getLang() { return currentLang; }
+
+function tr(key, vars) {
+  const cur = I18N_DICT[currentLang];
+  let str = cur && Object.prototype.hasOwnProperty.call(cur, key) ? cur[key] : null;
+  if (str == null) {
+    const ja = I18N_DICT.ja;
+    str = ja && Object.prototype.hasOwnProperty.call(ja, key) ? ja[key] : key;
+  }
+  if (vars && typeof str === 'string') {
+    str = str.replace(/\{(\w+)\}/g, (m, k) => Object.prototype.hasOwnProperty.call(vars, k) ? vars[k] : m);
+  }
+  return str;
+}
+
+function renderI18n(root) {
+  const r = root || document;
+  r.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = tr(key);
+  });
+  r.querySelectorAll('[data-i18n-attr]').forEach(el => {
+    const spec = el.getAttribute('data-i18n-attr');
+    if (!spec) return;
+    for (const pair of spec.split('|')) {
+      const eq = pair.indexOf('=');
+      if (eq < 0) continue;
+      const attr = pair.slice(0, eq).trim();
+      const key  = pair.slice(eq + 1).trim();
+      if (attr && key) el.setAttribute(attr, tr(key));
+    }
+  });
+  r.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (key) el.innerHTML = tr(key);
+  });
+  document.documentElement.setAttribute('lang', currentLang);
+}
+
 if (!('showDirectoryPicker' in window)) {
   document.body.innerHTML = `
     <div class="unsupported">
-      <h2>このブラウザは非対応です</h2>
+      <h2>このブラウザは非対応です / Unsupported browser</h2>
       <p>File System Access API が必要です。<br>
       <b>Chrome / Edge / Opera</b> などの Chromium 系ブラウザでお試しください。<br>
       (Firefox / Safari は現状未対応)</p>
+      <p>The File System Access API is required.<br>
+      Try a Chromium-based browser such as <b>Chrome / Edge / Opera</b>.<br>
+      (Firefox / Safari are not currently supported.)</p>
     </div>`;
   throw new Error('Unsupported');
 }
 
-// ==== IndexedDB =============================================================
 const DB_NAME = 'tsui-editor';
 const STORE = 'handles';
 const KEY_LAST = 'lastFolder';
@@ -1016,20 +1474,16 @@ async function idbGet(key) {
   });
 }
 
-// ==== State =================================================================
 let rootHandle = null;
 const expandedPaths = new Set();
-let tabs = [];  // {path, handle, content, originalContent, scrollTop, selStart, selEnd, encoding, eol, readonly, hasBom}
+let tabs = [];  
 let activeTabIndex = -1;
 let dragState = null;
 
-// ==== File size thresholds ==================================================
-const SIZE_WARN = 10 * 1024 * 1024;      // 10MB: 警告
-const SIZE_READONLY = 30 * 1024 * 1024;  // 30MB: readonly強制
-const SIZE_REJECT = 50 * 1024 * 1024;    // 50MB: 開くのを拒否
+const SIZE_WARN = 10 * 1024 * 1024;      
+const SIZE_READONLY = 30 * 1024 * 1024;  
+const SIZE_REJECT = 50 * 1024 * 1024;    
 
-// ==== Encoding detection ====================================================
-// BOMパターン
 const BOM_UTF8  = [0xEF, 0xBB, 0xBF];
 const BOM_UTF16LE = [0xFF, 0xFE];
 const BOM_UTF16BE = [0xFE, 0xFF];
@@ -1040,14 +1494,9 @@ function startsWith(bytes, prefix) {
   return true;
 }
 
-/**
- * ArrayBuffer からテキストへ復号。文字コードを自動判定する。
- * @returns {{ text: string, encoding: string, hasBom: boolean }}
- */
 function decodeBytes(arrayBuffer) {
   const bytes = new Uint8Array(arrayBuffer);
 
-  // BOM判定
   if (startsWith(bytes, BOM_UTF8)) {
     const view = bytes.subarray(3);
     return { text: new TextDecoder('utf-8').decode(view), encoding: 'UTF-8', hasBom: true };
@@ -1061,22 +1510,21 @@ function decodeBytes(arrayBuffer) {
     return { text: new TextDecoder('utf-16be').decode(view), encoding: 'UTF-16BE', hasBom: true };
   }
 
-  // UTF-8 を fatal で試す → 失敗なら Shift_JIS を試す
   try {
     const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
     return { text, encoding: 'UTF-8', hasBom: false };
   } catch {
-    // UTF-8として不正 → 日本語圏では Shift_JIS が最頻出
+    
     try {
       const text = new TextDecoder('shift_jis', { fatal: true }).decode(bytes);
       return { text, encoding: 'Shift_JIS', hasBom: false };
     } catch {
-      // さらにフォールバック: EUC-JP
+      
       try {
         const text = new TextDecoder('euc-jp', { fatal: true }).decode(bytes);
         return { text, encoding: 'EUC-JP', hasBom: false };
       } catch {
-        // 最後は UTF-8 non-fatal で文字化け覚悟の復号
+        
         const text = new TextDecoder('utf-8').decode(bytes);
         return { text, encoding: 'UTF-8?', hasBom: false };
       }
@@ -1084,12 +1532,8 @@ function decodeBytes(arrayBuffer) {
   }
 }
 
-/**
- * 改行コードを判定する。
- * @returns {'CRLF' | 'CR' | 'LF'}
- */
 function detectEol(text) {
-  // サンプリング: 先頭64KB程度で十分
+  
   const sample = text.length > 65536 ? text.slice(0, 65536) : text;
   let lf = 0, crlf = 0, cr = 0;
   for (let i = 0; i < sample.length; i++) {
@@ -1106,15 +1550,8 @@ function detectEol(text) {
   return 'LF';
 }
 
-/**
- * 保存用にエンコード。元のBOM・改行コードを尊重する。
- * 文字コードは UTF-8 / UTF-16LE / UTF-16BE のみサポート
- * (ブラウザの TextEncoder は UTF-8 固定で、他の TextEncoder 実装は標準に無い)。
- * それ以外の encoding (Shift_JIS, EUC-JP 等) が渡された場合は UTF-8 にフォールバック。
- * @returns {{ bytes: Uint8Array, fallback: boolean, actualEncoding: string }}
- */
 function encodeForSave(text, meta) {
-  // 改行コードをエディタ内部の \n から元の形式へ戻す
+  
   let normalized = text;
   if (meta.eol === 'CRLF') {
     normalized = text.replace(/\r?\n/g, '\r\n');
@@ -1123,10 +1560,10 @@ function encodeForSave(text, meta) {
   }
 
   const enc = meta.encoding;
-  // UTF-16LE / UTF-16BE は手動エンコード
+  
   if (enc === 'UTF-16LE' || enc === 'UTF-16BE') {
     const le = (enc === 'UTF-16LE');
-    // BOM (2バイト) + 各文字2バイト。サロゲートペアは2コードユニット扱い。
+    
     const len = normalized.length;
     const out = new Uint8Array((meta.hasBom ? 2 : 0) + len * 2);
     let p = 0;
@@ -1143,13 +1580,11 @@ function encodeForSave(text, meta) {
     return { bytes: out, fallback: false, actualEncoding: enc };
   }
 
-  // UTF-8 (またはそれ以外は UTF-8 にフォールバック)
-  const encoder = new TextEncoder(); // UTF-8 固定
+  const encoder = new TextEncoder(); 
   const body = encoder.encode(normalized);
   const isUtf8 = (enc === 'UTF-8' || enc === 'UTF-8?');
   const fallback = !isUtf8;
 
-  // BOM付与は UTF-8 で hasBom=true の時のみ
   if (isUtf8 && meta.hasBom) {
     const out = new Uint8Array(body.length + 3);
     out.set(BOM_UTF8, 0);
@@ -1159,7 +1594,6 @@ function encodeForSave(text, meta) {
   return { bytes: body, fallback, actualEncoding: 'UTF-8' };
 }
 
-// ==== Font size =============================================================
 const FONT_KEY = 'tsui-editor-font-size';
 const DEFAULT_FONT = 13;
 const MIN_FONT = 9;
@@ -1169,26 +1603,20 @@ let fontSize = (() => {
   return (isFinite(v) && v >= MIN_FONT && v <= MAX_FONT) ? v : DEFAULT_FONT;
 })();
 
-// ==== Tree font size ========================================================
 const TREE_SIZES = { s: 12.5, m: 17.5, l: 20, xl: 23 };
-const UI_FONT_DELTAS = { s: 0, m: 2, l: 4, xl: 7 };  // システム文字の加算px（S基準）
+const UI_FONT_DELTAS = { s: 0, m: 2, l: 4, xl: 7 };  
 const TREE_SIZE_KEY = 'tsui-editor-tree-size';
 let treeSize = (() => {
   const v = localStorage.getItem(TREE_SIZE_KEY);
   return (v === 's' || v === 'm' || v === 'l' || v === 'xl') ? v : 's';
 })();
 
-// ==== Editor wrap mode ======================================================
-// 'on'  : 長い行をエディタ幅で折り返す (default)
-// 'off' : 折り返さず横スクロール
 const WRAP_KEY = 'tsui-editor-wrap';
 let wrapMode = (() => {
   const v = localStorage.getItem(WRAP_KEY);
   return (v === 'on' || v === 'off') ? v : 'on';
 })();
 
-// ==== Theme =================================================================
-// 'calm' (default) または 5つのネオンテーマ — Tsui Clock 互換パレット
 const THEME_KEY = 'tsui-editor-theme';
 const VALID_THEMES = ['calm', 'green', 'amber', 'red', 'pink', 'cyber'];
 let themeMode = (() => {
@@ -1196,14 +1624,12 @@ let themeMode = (() => {
   return VALID_THEMES.includes(v) ? v : 'calm';
 })();
 
-// ==== Mobile / Sidebar ======================================================
 const MOBILE_BP = 768;
 const isMobile = () => window.innerWidth <= MOBILE_BP;
 function setSidebarVisible(visible) {
   document.body.classList.toggle('sidebar-hidden', !visible);
 }
 
-// ==== Elements ==============================================================
 const $path = document.getElementById('folder-path');
 const $sidebarEmpty = document.getElementById('sidebar-empty');
 const $sidebarToolbar = document.getElementById('sidebar-toolbar');
@@ -1232,7 +1658,11 @@ const $btnAbout = document.getElementById('btn-about');
 const $modalAbout = document.getElementById('modal-about');
 const $btnModalClose = document.getElementById('btn-modal-close');
 
-// ==== Apply font size =======================================================
+function revealHidden(el) {
+  el.classList.remove('initially-hidden');
+  el.style.display = '';
+}
+
 function applyFontSize() {
   $editor.style.fontSize = fontSize + 'px';
   $fontDisplay.textContent = fontSize + 'px';
@@ -1249,7 +1679,6 @@ $btnFontInc.addEventListener('click', () => changeFontSize(+1));
 $btnFontReset.addEventListener('click', () => { fontSize = DEFAULT_FONT; applyFontSize(); });
 applyFontSize();
 
-// ==== Apply tree size =======================================================
 function applyTreeSize() {
   document.documentElement.style.setProperty('--tree-font-size', TREE_SIZES[treeSize] + 'px');
   document.documentElement.style.setProperty('--ui-font-delta', UI_FONT_DELTAS[treeSize] + 'px');
@@ -1266,7 +1695,6 @@ document.querySelectorAll('.tree-size-btn').forEach(b => {
 });
 applyTreeSize();
 
-// ==== Apply wrap mode =======================================================
 function applyWrapMode() {
   document.body.classList.toggle('wrap-on', wrapMode === 'on');
   document.querySelectorAll('.wrap-btn').forEach(b => {
@@ -1282,7 +1710,6 @@ document.querySelectorAll('.wrap-btn').forEach(b => {
 });
 applyWrapMode();
 
-// ==== Apply theme ===========================================================
 function applyTheme() {
   if (themeMode === 'calm') {
     document.documentElement.removeAttribute('data-theme');
@@ -1302,7 +1729,45 @@ document.querySelectorAll('.theme-dot').forEach(b => {
 });
 applyTheme();
 
-// ==== Sidebar wiring ========================================================
+let lastFolderName = null;  
+
+function updateLangButton() {
+  const btn = document.getElementById('btn-lang');
+  if (!btn) return;
+  
+  btn.textContent = currentLang === 'ja' ? 'EN' : '日本語';
+  btn.setAttribute('title', currentLang === 'ja' ? tr('header.btn.lang.title.toEn') : tr('header.btn.lang.title.toJa'));
+}
+
+function updatePathLabel() {
+
+  if (rootHandle) $path.textContent = rootHandle.name + '/';
+}
+
+function updateReconnectLabel() {
+  if (!lastFolderName) return;
+
+  const visible = !$btnReconnect.classList.contains('initially-hidden') && $btnReconnect.style.display !== 'none';
+  if (!visible) return;
+  $btnReconnect.textContent = tr('header.btn.reconnect.prefix', { name: lastFolderName });
+}
+
+function setLangPref(lang) {
+  if (!VALID_LANGS.includes(lang)) return;
+  setLang(lang);
+  try { localStorage.setItem(LANG_KEY, lang); } catch {}
+  
+  renderI18n();
+  
+  updateLangButton();
+  updatePathLabel();
+  updateReconnectLabel();
+  if (typeof updateStatus === 'function') updateStatus();
+  if (typeof renderTabs === 'function') renderTabs();
+  
+  if (rootHandle && typeof renderTree === 'function') renderTree();
+}
+
 if (isMobile()) document.body.classList.add('sidebar-hidden');
 $btnToggleSidebar.addEventListener('click', () => {
   setSidebarVisible(document.body.classList.contains('sidebar-hidden'));
@@ -1318,7 +1783,6 @@ window.addEventListener('resize', () => {
   }
 });
 
-// ==== Binary detection ======================================================
 const BINARY_EXTS = new Set([
   'png','jpg','jpeg','gif','bmp','ico','webp',
   'pdf','zip','tar','gz','7z','rar',
@@ -1333,7 +1797,6 @@ function isProbablyText(name) {
   return !BINARY_EXTS.has(parts.pop().toLowerCase());
 }
 
-// ==== Path helpers ==========================================================
 function joinPath(dir, name) { return dir ? dir + '/' + name : name; }
 function parentOf(path) {
   const i = path.lastIndexOf('/');
@@ -1354,42 +1817,41 @@ async function getDirHandleByPath(path) {
   return current;
 }
 
-// ==== Boot / reconnect ======================================================
 async function init() {
   try {
     const saved = await idbGet(KEY_LAST);
     if (!saved) return;
+    lastFolderName = saved.name;
     const perm = await saved.queryPermission({ mode: 'readwrite' });
     if (perm === 'granted') {
       await adoptRoot(saved);
     } else {
-      $btnReconnect.textContent = `↻ 前回: ${saved.name}`;
-      $btnReconnect.style.display = '';
+      $btnReconnect.textContent = tr('header.btn.reconnect.prefix', { name: saved.name });
+      revealHidden($btnReconnect);
       $btnReconnect.onclick = async () => {
         const p = await saved.requestPermission({ mode: 'readwrite' });
         if (p === 'granted') {
           $btnReconnect.style.display = 'none';
           await adoptRoot(saved);
         } else {
-          alert('権限が得られませんでした');
+          alert(tr('alert.permNotGranted'));
         }
       };
     }
   } catch (e) {
-    console.warn('保存済みハンドルの復元失敗', e);
+    console.warn('failed to restore saved handle', e);
   }
 }
 
 async function adoptRoot(handle) {
   rootHandle = handle;
   $path.textContent = handle.name + '/';
-  $sidebarToolbar.style.display = '';
+  revealHidden($sidebarToolbar);
   expandedPaths.clear();
   await renderTree();
   try { await idbPut(KEY_LAST, handle); } catch {}
 }
 
-// ==== Open folder ===========================================================
 const WARN_ACK_KEY = 'fs-warning-ack-v1';
 
 function showFolderWarning() {
@@ -1398,20 +1860,20 @@ function showFolderWarning() {
     overlay.className = 'warn-overlay';
     overlay.innerHTML = `
       <div class="warn-modal" role="dialog" aria-labelledby="warn-title" aria-modal="true">
-        <h2 id="warn-title">⚠ 権限に関する重要な注意</h2>
-        <p>このアプリは、選択したフォルダ配下の<b>すべてのファイルに対して読み書き・削除の権限</b>を持ちます。</p>
-        <p style="margin-top:10px;">以下のような<b>システム的・個人的に重要なフォルダの選択は避けてください</b>：</p>
+        <h2 id="warn-title">${tr('warn.title')}</h2>
+        <p>${tr('warn.p1')}</p>
+        <p class="warn-spaced">${tr('warn.p2')}</p>
         <ul>
-          <li><code>C:\\</code> / <code>/</code> などルート直下</li>
-          <li>Desktop / Documents / Downloads</li>
-          <li>OneDrive / iCloud / Dropbox の同期フォルダ</li>
-          <li>Git リポジトリや開発プロジェクトのルート</li>
+          <li>${tr('warn.li1')}</li>
+          <li>${tr('warn.li2')}</li>
+          <li>${tr('warn.li3')}</li>
+          <li>${tr('warn.li4')}</li>
         </ul>
-        <p>推奨は、このエディタ専用に作った作業フォルダ（例: <code>C:\\tsui-workspace\\</code>）です。</p>
-        <p class="warn-note">この警告は初回のみ表示されます。</p>
+        <p>${tr('warn.recommended')}</p>
+        <p class="warn-note">${tr('warn.note')}</p>
         <div class="warn-actions">
-          <button id="warn-cancel">キャンセル</button>
-          <button id="warn-ok" class="primary">理解した上で開く</button>
+          <button id="warn-cancel">${tr('warn.btn.cancel')}</button>
+          <button id="warn-ok" class="primary">${tr('warn.btn.ok')}</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -1431,16 +1893,13 @@ function showFolderWarning() {
     overlay.querySelector('#warn-cancel').onclick = () => cleanup(false);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) cleanup(false); });
 
-    // フォーカスを「理解した上で開く」に当てる（Enterで即確定できるようにする意図ではなく、
-    // スクリーンリーダー／キーボード操作で現在位置を明示するため）
     setTimeout(() => overlay.querySelector('#warn-ok').focus(), 0);
   });
 }
 
 $btnOpen.addEventListener('click', async () => {
-  if (anyModified() && !confirm('未保存のタブがあります。破棄して別フォルダを開きますか？')) return;
+  if (anyModified() && !confirm(tr('confirm.discardOpenFolder'))) return;
 
-  // 初回のみ強い警告を表示
   if (!localStorage.getItem(WARN_ACK_KEY)) {
     const ok = await showFolderWarning();
     if (!ok) return;
@@ -1453,11 +1912,10 @@ $btnOpen.addEventListener('click', async () => {
     await adoptRoot(h);
     $btnReconnect.style.display = 'none';
   } catch (e) {
-    if (e.name !== 'AbortError') alert('フォルダを開けませんでした: ' + e.message);
+    if (e.name !== 'AbortError') alert(tr('alert.openFolderFailed', { msg: e.message }));
   }
 });
 
-// ==== Tree ==================================================================
 async function renderTree() {
   $tree.innerHTML = '';
   if (!rootHandle) {
@@ -1475,7 +1933,7 @@ async function loadChildrenInto(containerEl, dirHandle, pathPrefix, depth) {
   } catch (e) {
     const err = document.createElement('div');
     err.className = 'empty-state';
-    err.textContent = '読込エラー: ' + e.message;
+    err.textContent = tr('alert.treeReadError', { msg: e.message });
     containerEl.appendChild(err);
     return;
   }
@@ -1509,20 +1967,18 @@ function createTreeItem(entry, path, depth) {
   row.appendChild(icon);
   row.appendChild(label);
 
-  // 右端の⋮メニュー（モバイルでは常時表示、PCではホバー時表示）
-  // 長押し＋ドラッグの競合を解消し、明示的な操作点を提供する
   const menuBtn = document.createElement('button');
   menuBtn.className = 'tree-menu-btn';
   menuBtn.type = 'button';
   menuBtn.textContent = '⋮';
-  menuBtn.title = 'メニュー';
-  menuBtn.setAttribute('aria-label', 'メニュー');
+  menuBtn.title = tr('tree.menuBtn.title');
+  menuBtn.setAttribute('aria-label', tr('tree.menuBtn.aria'));
   menuBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     const rect = menuBtn.getBoundingClientRect();
     openTreeItemMenu(row, rect.left, rect.bottom);
   });
-  // メニューボタン自身はドラッグ起点にしない
+  
   menuBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
   row.appendChild(menuBtn);
 
@@ -1548,19 +2004,19 @@ function createTreeItem(entry, path, depth) {
     const actFile = document.createElement('span');
     actFile.className = 'tree-action-btn';
     actFile.textContent = '＋F';
-    actFile.title = 'このフォルダに新規ファイル';
+    actFile.title = tr('tree.action.newFile.title');
     actFile.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const n = prompt(`「${path}」に作成するファイル名:`, 'untitled.txt');
+      const n = prompt(tr('prompt.fileAt', { path }), tr('prompt.default.untitled'));
       if (n) { expandedPaths.add(path); await createFileAt(path, n.trim()); }
     });
     const actFolder = document.createElement('span');
     actFolder.className = 'tree-action-btn';
     actFolder.textContent = '＋D';
-    actFolder.title = 'このフォルダに新規フォルダ';
+    actFolder.title = tr('tree.action.newFolder.title');
     actFolder.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const n = prompt(`「${path}」に作成するフォルダ名:`, 'new-folder');
+      const n = prompt(tr('prompt.folderAt', { path }), tr('prompt.default.newFolder'));
       if (n) { expandedPaths.add(path); await createFolderAt(path, n.trim()); }
     });
     actions.appendChild(actFile);
@@ -1614,7 +2070,6 @@ function updateTreeHighlights() {
   });
 }
 
-// ==== Drag & Drop ===========================================================
 $tree.addEventListener('dragover', (e) => {
   if (!dragState) return;
   const rowEl = e.target.closest('.tree-node');
@@ -1663,7 +2118,7 @@ $tree.addEventListener('drop', async (e) => {
   if (srcParent === destPath) return;
   if (prevState.path === destPath) return;
   if (prevState.kind === 'directory' && isAncestor(prevState.path, destPath)) {
-    alert('自分自身または子孫には移動できません');
+    alert(tr('alert.cantMoveToSelfOrChild'));
     return;
   }
   await moveEntry(prevState.path, prevState.kind, destPath);
@@ -1687,9 +2142,9 @@ async function moveEntry(srcPath, srcKind, destDirPath) {
     try { await destDir.getDirectoryHandle(srcName); existingDir = true; } catch {}
     if (existingFile || existingDir) {
       if (srcKind === 'file' && existingFile && !existingDir) {
-        if (!confirm(`移動先に「${srcName}」が既に存在します。上書きしますか？`)) return;
+        if (!confirm(tr('confirm.moveOverwrite', { name: srcName }))) return;
       } else {
-        alert(`移動先に同名の${existingDir ? 'フォルダ' : 'ファイル'}が既に存在します`);
+        alert(tr(existingDir ? 'alert.dupExistsAtDest.dir' : 'alert.dupExistsAtDest.file'));
         return;
       }
     }
@@ -1706,10 +2161,10 @@ async function moveEntry(srcPath, srcKind, destDirPath) {
         fixExpandedAfterRename(srcPath, newPath);
         expandedPaths.add(destDirPath);
         await renderTree();
-        flashStatus(`移動: ${srcName}`);
+        flashStatus(tr('flash.move', { name: srcName }));
         return;
       } catch (err) {
-        console.warn('move() 失敗、fallback:', err);
+        console.warn('move() failed, falling back:', err);
       }
     }
 
@@ -1725,16 +2180,15 @@ async function moveEntry(srcPath, srcKind, destDirPath) {
       handleTabsAfterRename(srcPath, newPath, newHandle);
       expandedPaths.add(destDirPath);
       await renderTree();
-      flashStatus(`移動: ${srcName}`);
+      flashStatus(tr('flash.move', { name: srcName }));
     } else {
-      alert('このブラウザではフォルダの移動に対応していません (ファイルなら可能)');
+      alert(tr('alert.cantMoveDir'));
     }
   } catch (e) {
-    alert('移動に失敗: ' + e.message);
+    alert(tr('alert.moveFailed', { msg: e.message }));
   }
 }
 
-// ==== Tabs ==================================================================
 async function openInTab(fileHandle, path) {
   const idx = tabs.findIndex(t => t.path === path);
   if (idx >= 0) {
@@ -1743,25 +2197,23 @@ async function openInTab(fileHandle, path) {
     return;
   }
   if (!isProbablyText(fileHandle.name)) {
-    if (!confirm(`「${fileHandle.name}」はバイナリの可能性があります。それでも開きますか？`)) return;
+    if (!confirm(tr('confirm.binaryFile', { name: fileHandle.name }))) return;
   }
   try {
     const file = await fileHandle.getFile();
 
-    // サイズチェック
     if (file.size >= SIZE_REJECT) {
-      alert(`ファイルサイズが大きすぎます (${formatSize(file.size)} ≥ ${formatSize(SIZE_REJECT)})。\nこのアプリでは開けません。`);
+      alert(tr('alert.fileTooLarge', { size: formatSize(file.size), limit: formatSize(SIZE_REJECT) }));
       return;
     }
     let readonly = false;
     if (file.size >= SIZE_READONLY) {
-      if (!confirm(`大きなファイルです (${formatSize(file.size)})。\n読み取り専用で開きます。続行しますか？`)) return;
+      if (!confirm(tr('confirm.sizeReadonly', { size: formatSize(file.size) }))) return;
       readonly = true;
     } else if (file.size >= SIZE_WARN) {
-      if (!confirm(`大きめのファイルです (${formatSize(file.size)})。\n動作が重くなる可能性があります。開きますか？`)) return;
+      if (!confirm(tr('confirm.sizeWarn', { size: formatSize(file.size) }))) return;
     }
 
-    // 文字コード自動判定
     const buf = await file.arrayBuffer();
     const decoded = decodeBytes(buf);
     const text = decoded.text;
@@ -1782,7 +2234,7 @@ async function openInTab(fileHandle, path) {
     updateTreeHighlights();
     if (isMobile()) setSidebarVisible(false);
   } catch (e) {
-    alert('ファイルを開けませんでした: ' + e.message);
+    alert(tr('alert.openFileFailed', { msg: e.message }));
   }
 }
 
@@ -1830,7 +2282,7 @@ function applyActiveTab() {
 function closeTab(idx) {
   const t = tabs[idx];
   if (isTabDirty(t)) {
-    if (!confirm(`「${t.path}」の変更は保存されていません。破棄しますか？`)) return;
+    if (!confirm(tr('confirm.tabCloseDirty', { path: t.path }))) return;
   }
   tabs.splice(idx, 1);
   if (tabs.length === 0) activeTabIndex = -1;
@@ -1875,13 +2327,9 @@ function renderTabs() {
   });
 }
 
-// タブの未保存判定: 本文変更 OR メタ情報変更 (encoding/eol)
 function isTabDirty(t) { return t.content !== t.originalContent || !!t.metaDirty; }
 function anyModified() { return tabs.some(isTabDirty); }
 
-// ==== Editor input ==========================================================
-// 大ファイル編集時の体感軽量化のため、重い再描画（タブバー/ステータスバー）
-// は 120ms debounce。保存ボタンの有効化だけは即時で Ctrl+S の反応を保つ。
 let inputDebounceTimer = null;
 function flushInputDebounce() {
   if (inputDebounceTimer !== null) {
@@ -1920,9 +2368,7 @@ function updateStatus() {
     return;
   }
   const t = tabs[activeTabIndex];
-  // 未修正(本文・メタとも未変更)時は保存済みの正確なバイト数を使う。
-  // 本文 or メタが変わると保存時のバイト数も変わり得るため、original の比率で推定し
-  // 「~」プレフィックスで概算表示であることを明示する（Blob再計算のコスト回避）。
+
   let bytesLabel;
   if (!isTabDirty(t)) {
     bytesLabel = formatSize(t.originalBytes);
@@ -1932,7 +2378,7 @@ function updateStatus() {
     const est = Math.round(t.content.length * ratio);
     bytesLabel = '~' + formatSize(est);
   }
-  $statusInfo.textContent = `${t.path} · ${bytesLabel} · ${t.content.length.toLocaleString()} 文字`;
+  $statusInfo.textContent = `${t.path} · ${bytesLabel} · ${t.content.length.toLocaleString()} ${tr('status.charSuffix')}`;
   updatePills();
 }
 function updatePills() {
@@ -1943,14 +2389,14 @@ function updatePills() {
     return;
   }
   const t = tabs[activeTabIndex];
-  $pillReadonly.style.display = t.readonly ? '' : 'none';
-  $pillEncoding.style.display = '';
+  if (t.readonly) revealHidden($pillReadonly);
+  else $pillReadonly.style.display = 'none';
+  revealHidden($pillEncoding);
   $pillEncoding.textContent = t.encoding + (t.hasBom ? ' BOM' : '');
-  $pillEol.style.display = '';
+  revealHidden($pillEol);
   $pillEol.textContent = t.eol;
 }
 
-// ==== Save ==================================================================
 async function saveActive() {
   if (activeTabIndex < 0) return;
   const t = tabs[activeTabIndex];
@@ -1961,7 +2407,7 @@ async function saveActive() {
   try {
     const result = encodeForSave(t.content, { encoding: t.encoding, hasBom: t.hasBom, eol: t.eol });
     if (result.fallback) {
-      if (!confirm(`${t.encoding} での保存はこのアプリでは非対応のため、UTF-8 で保存します。\n(以降、この形式で保存されます)`)) return;
+      if (!confirm(tr('confirm.encodingFallback', { encoding: t.encoding }))) return;
       t.encoding = result.actualEncoding;
       t.hasBom = false;
     }
@@ -1976,21 +2422,19 @@ async function saveActive() {
     try {
       await writeWith(t.handle);
     } catch (e1) {
-      // InvalidStateError の場合はハンドルを取り直して再試行
-      // (File System Access API の mtime キャッシュ不整合の既知問題への対処)
+
       const isStaleState =
         e1.name === 'InvalidStateError' ||
         /state had changed|state cached/i.test(e1.message || '');
 
       if (!isStaleState) throw e1;
 
-      // rootHandle から path 経由でハンドルを再取得
       const parts = t.path.split('/').filter(Boolean);
       const fileName = parts.pop();
       let dir = rootHandle;
       for (const p of parts) dir = await dir.getDirectoryHandle(p);
       const freshHandle = await dir.getFileHandle(fileName);
-      t.handle = freshHandle;  // 以降はこの新しいハンドルを使う
+      t.handle = freshHandle;  
       await writeWith(freshHandle);
     }
 
@@ -2000,38 +2444,37 @@ async function saveActive() {
     updateSaveButton();
     updateStatus();
     renderTabs();
-    flashStatus('保存しました');
+    flashStatus(tr('flash.saved'));
   } catch (e) {
-    alert('保存に失敗しました: ' + e.message);
+    alert(tr('alert.saveFailed', { msg: e.message }));
   }
 }
 async function ensurePermission(handle) {
   const perm = await handle.queryPermission({ mode: 'readwrite' });
   if (perm === 'granted') return;
   const req = await handle.requestPermission({ mode: 'readwrite' });
-  if (req !== 'granted') throw new Error('書き込み権限がありません');
+  if (req !== 'granted') throw new Error(tr('alert.permWriteDenied'));
 }
 $btnSave.addEventListener('click', saveActive);
 
-// ==== Pill interactions =====================================================
 $pillEncoding.addEventListener('click', (e) => {
   if (activeTabIndex < 0) return;
   e.stopPropagation();
   const t = tabs[activeTabIndex];
   const items = [
-    { label: '── 再読込 ──' },
-    { label: 'UTF-8 で再読込', action: () => reloadWithEncoding('UTF-8', false) },
-    { label: 'UTF-8 BOM で再読込', action: () => reloadWithEncoding('UTF-8', true) },
-    { label: 'Shift_JIS で再読込', action: () => reloadWithEncoding('Shift_JIS', false) },
-    { label: 'EUC-JP で再読込', action: () => reloadWithEncoding('EUC-JP', false) },
-    { label: 'UTF-16LE で再読込', action: () => reloadWithEncoding('UTF-16LE', false) },
+    { label: tr('ctx.heading.reload') },
+    { label: tr('ctx.encoding.utf8.reload'), action: () => reloadWithEncoding('UTF-8', false) },
+    { label: tr('ctx.encoding.utf8Bom.reload'), action: () => reloadWithEncoding('UTF-8', true) },
+    { label: tr('ctx.encoding.shiftJis.reload'), action: () => reloadWithEncoding('Shift_JIS', false) },
+    { label: tr('ctx.encoding.eucJp.reload'), action: () => reloadWithEncoding('EUC-JP', false) },
+    { label: tr('ctx.encoding.utf16le.reload'), action: () => reloadWithEncoding('UTF-16LE', false) },
     { separator: true },
-    { label: '── 保存時の形式を変更 ──' },
-    { label: 'UTF-8 (BOM無し) にする' + (t.encoding === 'UTF-8' && !t.hasBom ? ' ✓' : ''),
+    { label: tr('ctx.heading.changeSaveFormat') },
+    { label: tr('ctx.encoding.utf8.set') + (t.encoding === 'UTF-8' && !t.hasBom ? ' ✓' : ''),
       action: () => { t.encoding = 'UTF-8'; t.hasBom = false; markDirty(); updateStatus(); } },
-    { label: 'UTF-8 BOM にする' + (t.encoding === 'UTF-8' && t.hasBom ? ' ✓' : ''),
+    { label: tr('ctx.encoding.utf8Bom.set') + (t.encoding === 'UTF-8' && t.hasBom ? ' ✓' : ''),
       action: () => { t.encoding = 'UTF-8'; t.hasBom = true; markDirty(); updateStatus(); } },
-    { label: 'UTF-16LE BOM にする' + (t.encoding === 'UTF-16LE' ? ' ✓' : ''),
+    { label: tr('ctx.encoding.utf16leBom.set') + (t.encoding === 'UTF-16LE' ? ' ✓' : ''),
       action: () => { t.encoding = 'UTF-16LE'; t.hasBom = true; markDirty(); updateStatus(); } },
   ];
   const rect = $pillEncoding.getBoundingClientRect();
@@ -2043,11 +2486,11 @@ $pillEol.addEventListener('click', (e) => {
   e.stopPropagation();
   const t = tabs[activeTabIndex];
   const items = [
-    { label: 'LF (Unix/macOS)' + (t.eol === 'LF' ? ' ✓' : ''),
+    { label: tr('ctx.eol.lf') + (t.eol === 'LF' ? ' ✓' : ''),
       action: () => { t.eol = 'LF'; markDirty(); updateStatus(); } },
-    { label: 'CRLF (Windows)' + (t.eol === 'CRLF' ? ' ✓' : ''),
+    { label: tr('ctx.eol.crlf') + (t.eol === 'CRLF' ? ' ✓' : ''),
       action: () => { t.eol = 'CRLF'; markDirty(); updateStatus(); } },
-    { label: 'CR (旧Mac)' + (t.eol === 'CR' ? ' ✓' : ''),
+    { label: tr('ctx.eol.cr') + (t.eol === 'CR' ? ' ✓' : ''),
       action: () => { t.eol = 'CR'; markDirty(); updateStatus(); } },
   ];
   const rect = $pillEol.getBoundingClientRect();
@@ -2058,39 +2501,35 @@ $pillReadonly.addEventListener('click', (e) => {
   if (activeTabIndex < 0) return;
   const t = tabs[activeTabIndex];
   if (t.readonly) {
-    if (confirm('読み取り専用を解除します。大きなファイルの編集は動作が重くなる可能性があります。続行しますか？')) {
+    if (confirm(tr('confirm.releaseReadonly'))) {
       t.readonly = false;
       $editor.readOnly = false;
       updateStatus();
       updateSaveButton();
-      flashStatus('書き込み可能にしました');
+      flashStatus(tr('flash.editable'));
     }
   }
 });
 
-// エンコーディング変更などで「要保存」状態にする
 function markDirty() {
   if (activeTabIndex < 0) return;
   const t = tabs[activeTabIndex];
-  // content と originalContent が同じでも保存ボタンを有効化するため、
-  // originalContent の末尾に目印的にゼロ幅を付けるのは避けたい。
-  // 代わりに savedMeta を別途保持して、metaが変わったら dirty 扱いにする。
+
   t.metaDirty = true;
   renderTabs();
 }
 
-// 再読込 (別エンコーディングで読み直す)
 async function reloadWithEncoding(encoding, hasBom) {
   if (activeTabIndex < 0) return;
   const t = tabs[activeTabIndex];
   if (isTabDirty(t)) {
-    if (!confirm('未保存の変更があります。破棄して再読込しますか？')) return;
+    if (!confirm(tr('confirm.reloadDirty'))) return;
   }
   try {
     const file = await t.handle.getFile();
     const buffer = await file.arrayBuffer();
     let bytes = new Uint8Array(buffer);
-    // BOMがあれば除去
+    
     if (startsWith(bytes, BOM_UTF8)) bytes = bytes.subarray(3);
     else if (startsWith(bytes, BOM_UTF16LE)) bytes = bytes.subarray(2);
     else if (startsWith(bytes, BOM_UTF16BE)) bytes = bytes.subarray(2);
@@ -2098,16 +2537,12 @@ async function reloadWithEncoding(encoding, hasBom) {
     const label = encoding.toLowerCase().replace('_', '-');
     let text;
     try {
-      // まずfatalで試し、不正バイトがあればエラー → ユーザーに確認
+      
       text = new TextDecoder(label, { fatal: true }).decode(bytes);
     } catch (e) {
-      const ok = confirm(
-        `${encoding} として正しくデコードできませんでした。\n` +
-        `このエンコーディングではないファイルの可能性があります。\n\n` +
-        `文字化けする可能性がありますが、それでも読み込みますか？`
-      );
+      const ok = confirm(tr('confirm.decodeFailed', { encoding }));
       if (!ok) return;
-      // non-fatalで読み込み (U+FFFD 置換)
+      
       text = new TextDecoder(label).decode(bytes);
     }
 
@@ -2124,13 +2559,12 @@ async function reloadWithEncoding(encoding, hasBom) {
     updateSaveButton();
     updateStatus();
     renderTabs();
-    flashStatus(`${encoding} で再読込`);
+    flashStatus(tr('flash.reload', { encoding }));
   } catch (e) {
-    alert('再読込に失敗: ' + e.message);
+    alert(tr('alert.reloadFailed', { msg: e.message }));
   }
 }
 
-// ==== About modal ===========================================================
 function openAbout() { $modalAbout.classList.add('open'); }
 function closeAbout() { $modalAbout.classList.remove('open'); }
 $btnAbout.addEventListener('click', openAbout);
@@ -2139,42 +2573,41 @@ $modalAbout.addEventListener('click', (e) => {
   if (e.target === $modalAbout) closeAbout();
 });
 
-// ==== File operations =======================================================
 async function createFileAt(parentPath, name) {
   try {
     const dir = await getDirHandleByPath(parentPath);
     await ensurePermission(dir);
-    // 既存チェック: 同名のファイル/フォルダがあれば拒否(意図しない既存ファイルへのアクセスを防ぐ)
+    
     let existingFile = false, existingDir = false;
     try { await dir.getFileHandle(name); existingFile = true; } catch {}
     try { await dir.getDirectoryHandle(name); existingDir = true; } catch {}
     if (existingFile || existingDir) {
-      alert(`「${name}」は既に存在します（${existingDir ? 'フォルダ' : 'ファイル'}）。別の名前を指定してください。`);
+      alert(tr(existingDir ? 'alert.alreadyExists.dir' : 'alert.alreadyExists.file', { name }));
       return;
     }
     const fileHandle = await dir.getFileHandle(name, { create: true });
     expandedPaths.add(parentPath);
     await renderTree();
-    // 作成したファイルを自動で開く
+    
     await openInTab(fileHandle, joinPath(parentPath, name));
-  } catch (e) { alert('ファイル作成に失敗: ' + e.message); }
+  } catch (e) { alert(tr('alert.createFileFailed', { msg: e.message })); }
 }
 async function createFolderAt(parentPath, name) {
   try {
     const dir = await getDirHandleByPath(parentPath);
     await ensurePermission(dir);
-    // 既存チェック: 同名のファイル/フォルダがあれば拒否
+    
     let existingFile = false, existingDir = false;
     try { await dir.getFileHandle(name); existingFile = true; } catch {}
     try { await dir.getDirectoryHandle(name); existingDir = true; } catch {}
     if (existingFile || existingDir) {
-      alert(`「${name}」は既に存在します（${existingDir ? 'フォルダ' : 'ファイル'}）。別の名前を指定してください。`);
+      alert(tr(existingDir ? 'alert.alreadyExists.dir' : 'alert.alreadyExists.file', { name }));
       return;
     }
     await dir.getDirectoryHandle(name, { create: true });
     expandedPaths.add(parentPath);
     await renderTree();
-  } catch (e) { alert('フォルダ作成に失敗: ' + e.message); }
+  } catch (e) { alert(tr('alert.createFolderFailed', { msg: e.message })); }
 }
 async function deleteEntry(path, kind) {
   try {
@@ -2186,25 +2619,25 @@ async function deleteEntry(path, kind) {
       if (p === path || p.startsWith(path + '/')) expandedPaths.delete(p);
     }
     await renderTree();
-  } catch (e) { alert('削除に失敗: ' + e.message); }
+  } catch (e) { alert(tr('alert.deleteFailed', { msg: e.message })); }
 }
 async function renameEntry(oldPath, kind, newName) {
   if (!newName || newName === basename(oldPath)) return;
   if (newName.includes('/') || newName.includes('\\')) {
-    alert('名前に / や \\ は使えません'); return;
+    alert(tr('alert.invalidName')); return;
   }
   const parent = await getDirHandleByPath(parentOf(oldPath));
   await ensurePermission(parent);
   const newPath = joinPath(parentOf(oldPath), newName);
-  // 既存チェック: リネーム先に同名ファイル/フォルダがある場合の上書き判定 (moveEntry と同じパターン)
+  
   let existingFile = false, existingDir = false;
   try { await parent.getFileHandle(newName); existingFile = true; } catch {}
   try { await parent.getDirectoryHandle(newName); existingDir = true; } catch {}
   if (existingFile || existingDir) {
     if (kind === 'file' && existingFile && !existingDir) {
-      if (!confirm(`「${newName}」は既に存在します。上書きしますか？`)) return;
+      if (!confirm(tr('confirm.renameOverwrite', { name: newName }))) return;
     } else {
-      alert(`「${newName}」は既に存在します（${existingDir ? 'フォルダ' : 'ファイル'}）。別の名前を指定してください。`);
+      alert(tr(existingDir ? 'alert.alreadyExists.dir' : 'alert.alreadyExists.file', { name: newName }));
       return;
     }
   }
@@ -2214,7 +2647,7 @@ async function renameEntry(oldPath, kind, newName) {
       : await parent.getDirectoryHandle(basename(oldPath));
     if (typeof handle.move === 'function') {
       try {
-        // 上書き確認済みなので、handle.move() が既存に阻まれる場合は事前に削除
+        
         if (existingFile && kind === 'file') {
           try { await parent.removeEntry(newName); } catch {}
         }
@@ -2223,7 +2656,7 @@ async function renameEntry(oldPath, kind, newName) {
         fixExpandedAfterRename(oldPath, newPath);
         await renderTree();
         return;
-      } catch (e) { console.warn('handle.move() 失敗、fallbackへ:', e); }
+      } catch (e) { console.warn('handle.move() failed, falling back:', e); }
     }
     if (kind === 'file') {
       const file = await handle.getFile();
@@ -2236,9 +2669,9 @@ async function renameEntry(oldPath, kind, newName) {
       handleTabsAfterRename(oldPath, newPath, newHandle);
       await renderTree();
     } else {
-      alert('このブラウザではディレクトリのリネームに対応していません');
+      alert(tr('alert.dirRenameNotSupported'));
     }
-  } catch (e) { alert('リネームに失敗: ' + e.message); }
+  } catch (e) { alert(tr('alert.renameFailed', { msg: e.message })); }
 }
 
 function fixExpandedAfterRename(oldPath, newPath) {
@@ -2275,31 +2708,28 @@ function handleTabsAfterRename(oldPath, newPath, newHandle) {
   updateStatus();
 }
 
-// ==== Toolbar ===============================================================
 $btnNewFile.addEventListener('click', async () => {
   if (!rootHandle) return;
-  const name = prompt('新規ファイル名:', 'untitled.txt');
+  const name = prompt(tr('prompt.newFileTitle'), tr('prompt.default.untitled'));
   if (name) await createFileAt('', name.trim());
 });
 $btnNewFolder.addEventListener('click', async () => {
   if (!rootHandle) return;
-  const name = prompt('新規フォルダ名:', 'new-folder');
+  const name = prompt(tr('prompt.newFolderTitle'), tr('prompt.default.newFolder'));
   if (name) await createFolderAt('', name.trim());
 });
 $btnRefresh.addEventListener('click', () => renderTree());
 
-// ==== Context menu ==========================================================
-// ツリー項目に対するメニュー表示（PCの右クリック／モバイルの⋮タップの両方から呼ぶ）
 function openTreeItemMenu(rowEl, clientX, clientY) {
   if (!rowEl) {
-    // 空白クリック時: ルート直下の新規作成メニュー
+    
     showContextMenu(clientX, clientY, [
-      { label: '＋ 新規ファイル', action: async () => {
-        const n = prompt('ファイル名:', 'untitled.txt');
+      { label: tr('ctx.action.newFile'), action: async () => {
+        const n = prompt(tr('prompt.fileName'), tr('prompt.default.untitled'));
         if (n) await createFileAt('', n.trim());
       }},
-      { label: '＋ 新規フォルダ', action: async () => {
-        const n = prompt('フォルダ名:', 'new-folder');
+      { label: tr('ctx.action.newFolder'), action: async () => {
+        const n = prompt(tr('prompt.folderName'), tr('prompt.default.newFolder'));
         if (n) await createFolderAt('', n.trim());
       }}
     ]);
@@ -2311,25 +2741,25 @@ function openTreeItemMenu(rowEl, clientX, clientY) {
   const kind = item.dataset.kind;
   if (kind === 'directory') {
     showContextMenu(clientX, clientY, [
-      { label: '＋ 新規ファイル', action: async () => {
-        const n = prompt('ファイル名:', 'untitled.txt');
+      { label: tr('ctx.action.newFile'), action: async () => {
+        const n = prompt(tr('prompt.fileName'), tr('prompt.default.untitled'));
         if (n) { expandedPaths.add(path); await createFileAt(path, n.trim()); }
       }},
-      { label: '＋ 新規フォルダ', action: async () => {
-        const n = prompt('フォルダ名:', 'new-folder');
+      { label: tr('ctx.action.newFolder'), action: async () => {
+        const n = prompt(tr('prompt.folderName'), tr('prompt.default.newFolder'));
         if (n) { expandedPaths.add(path); await createFolderAt(path, n.trim()); }
       }},
       { separator: true },
-      { label: '名前変更', action: () => startInlineRename(rowEl, path, 'directory') },
-      { label: '削除', danger: true, action: async () => {
-        if (confirm(`「${path}」を削除しますか？(中身ごと)`)) await deleteEntry(path, 'directory');
+      { label: tr('ctx.action.rename'), action: () => startInlineRename(rowEl, path, 'directory') },
+      { label: tr('ctx.action.delete'), danger: true, action: async () => {
+        if (confirm(tr('confirm.deleteDir', { path }))) await deleteEntry(path, 'directory');
       }}
     ]);
   } else {
     showContextMenu(clientX, clientY, [
-      { label: '名前変更', action: () => startInlineRename(rowEl, path, 'file') },
-      { label: '削除', danger: true, action: async () => {
-        if (confirm(`「${path}」を削除しますか？`)) await deleteEntry(path, 'file');
+      { label: tr('ctx.action.rename'), action: () => startInlineRename(rowEl, path, 'file') },
+      { label: tr('ctx.action.delete'), danger: true, action: async () => {
+        if (confirm(tr('confirm.deleteFile', { path }))) await deleteEntry(path, 'file');
       }}
     ]);
   }
@@ -2355,7 +2785,7 @@ function showContextMenu(x, y, items, placement = 'down') {
     it.className = 'context-item' + (item.danger ? ' danger' : '');
     it.textContent = item.label;
     if (!item.action) {
-      // クリック無効の見出しラベル
+      
       it.style.color = 'var(--fg-faint)';
       it.style.fontSize = '10.5px';
       it.style.pointerEvents = 'none';
@@ -2378,7 +2808,6 @@ function showContextMenu(x, y, items, placement = 'down') {
 function hideContextMenu() { $ctxMenu.style.display = 'none'; }
 document.addEventListener('click', hideContextMenu);
 
-// ==== Inline rename =========================================================
 function startInlineRename(rowEl, path, kind) {
   const labelEl = rowEl.querySelector('.tree-label');
   if (!labelEl) return;
@@ -2414,7 +2843,6 @@ function startInlineRename(rowEl, path, kind) {
   input.addEventListener('click', e => e.stopPropagation());
 }
 
-// ==== Keyboard shortcuts ====================================================
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     hideContextMenu();
@@ -2439,7 +2867,7 @@ document.addEventListener('keydown', (e) => {
   } else if (k === 'n') {
     e.preventDefault();
     if (rootHandle) {
-      const n = prompt('新規ファイル名:', 'untitled.txt');
+      const n = prompt(tr('prompt.newFileTitle'), tr('prompt.default.untitled'));
       if (n) createFileAt('', n.trim());
     }
   } else if (k === 'b') {
@@ -2452,37 +2880,30 @@ window.addEventListener('beforeunload', (e) => {
   if (anyModified()) { e.preventDefault(); e.returnValue = ''; }
 });
 
-// ==== Mobile back button guard ==============================================
-// モバイルの戻るボタンで意図せずアプリが閉じるのを防ぐ。
-// 仕組み: 起動時にダミー履歴を1つ積み、popstate を捕捉。
-// 未保存タブがあれば確認、キャンセル時は再度 pushState で留まる。
-// 未保存が無ければそのまま閉じる（毎回確認で鬱陶しくならないように）。
 (() => {
   try { history.pushState({ tsuiGuard: true }, ''); } catch {}
 
   window.addEventListener('popstate', (e) => {
     if (anyModified()) {
-      if (confirm('未保存のタブがあります。破棄して閉じますか？')) {
-        // ユーザーが閉じることに同意 → そのまま離脱させる
-        // (このpopstateで既に履歴が1つ戻っているので、もう一度戻る動作をさせる)
+      if (confirm(tr('confirm.popstateDiscard'))) {
+
         history.back();
       } else {
-        // 留まる: 再度ダミー履歴を積み直す
+        
         try { history.pushState({ tsuiGuard: true }, ''); } catch {}
       }
     } else {
-      // 未保存なし: 素直に閉じる動作を許容（追加履歴は積まない）
-      // 元々の戻る動作が完了した状態なので何もしない
+
     }
   });
 })();
 
-// ==== Helpers ===============================================================
 function formatSize(b) {
   if (b < 1024) return b + ' B';
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
   return (b / 1024 / 1024).toFixed(2) + ' MB';
 }
+
 let flashTimer = null;
 function flashStatus(msg) {
   $statusInfo.textContent = '✓ ' + msg;
@@ -2494,27 +2915,27 @@ function flashStatus(msg) {
   }, 1500);
 }
 
-// ==== PWA (manifest & Service Worker) =======================================
-// file:// では CORS エラーになるだけで効果も無いので、http/https の時のみ有効化
 (() => {
+  const build = document.documentElement.dataset.build;
+  if (build !== 'cloudflare') return;
   const scheme = location.protocol;
   if (scheme !== 'http:' && scheme !== 'https:') return;
-  // manifest を動的に追加
-  if (!document.querySelector('link[rel="manifest"]')) {
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = './manifest.json';
-    document.head.appendChild(link);
-  }
-  // Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
     });
   }
 })();
 
-// ==== Go ====================================================================
+renderI18n();
+updateLangButton();
+const $btnLang = document.getElementById('btn-lang');
+if ($btnLang) {
+  $btnLang.addEventListener('click', () => {
+    setLangPref(currentLang === 'ja' ? 'en' : 'ja');
+  });
+}
+
 init();
 </script>
 </body>
