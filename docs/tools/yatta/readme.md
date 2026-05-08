@@ -1,9 +1,23 @@
 ## やった？  
 
+「あれ、朝の薬飲んだっけ？」を解決する、めちゃくちゃシンプルなツール。  
+
 「やった？」解説ノート記事  
 [https://note.com/hajimetwi3/n/n3dc77378c5c4](https://note.com/hajimetwi3/n/n3dc77378c5c4)  
 
 項目を作成・編集した後、「データの保存・読み込み」⇒「エクスポート (JSON)」を行い、バックアップを取得する事を推奨します。
+
+---
+
+## ウェブサイト版
+
+以下URLからご利用可能です。  
+[https://hajimetwi3.github.io/misc/tools/yatta/](https://hajimetwi3.github.io/misc/tools/yatta/)  
+
+## ダウンロード版
+
+以下をダウンロードしてご利用ください。  
+[https://github.com/hajimetwi3/misc/blob/main/docs/tools/yatta/index.html](https://github.com/hajimetwi3/misc/blob/main/docs/tools/yatta/index.html)
 
 ---  
 ## 注意事項  
