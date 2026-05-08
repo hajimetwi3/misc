@@ -9,7 +9,7 @@
 
   Name:        Tsui Editor
   Author:      Hajime Tsui
-  Version:     1.1.0
+  Version:     1.2.0
 
   ─── License ─────────────────────────────────────────────────────
 
@@ -163,13 +163,48 @@
 
   main {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: var(--sidebar-width, 260px) 6px 1fr;
     overflow: hidden;
     position: relative;
   }
 
   body.sidebar-hidden main { grid-template-columns: 1fr; }
   body.sidebar-hidden #sidebar { display: none; }
+  body.sidebar-hidden #sidebar-resizer { display: none; }
+
+  
+  #sidebar-resizer {
+    position: relative;
+    cursor: col-resize;
+    background: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 10;
+  }
+  #sidebar-resizer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    pointer-events: none;
+  }
+  #sidebar-resizer:hover::before,
+  body.sidebar-resizing #sidebar-resizer::before {
+    opacity: 0.55;
+  }
+  
+  body.sidebar-resizing,
+  body.sidebar-resizing * {
+    cursor: col-resize !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
 
   #sidebar-backdrop {
     display: none;
@@ -808,6 +843,8 @@
 
     main { grid-template-columns: 1fr; }
 
+    #sidebar-resizer { display: none; }
+
     #sidebar {
       position: absolute;
       left: 0;
@@ -963,9 +1000,12 @@
          data-i18n-attr="title=sidebar.about.title"
          title="このアプリについて">
       <span>ABOUT</span>
-      <span>v1.1.0</span>
+      <span>v1.2.0</span>
     </div>
   </aside>
+  <div id="sidebar-resizer" role="separator" aria-orientation="vertical"
+       data-i18n-attr="aria-label=sidebar.resizer.aria"
+       aria-label="サイドバーの幅を調整"></div>
   <section id="editor-area">
     <div class="tab-bar" id="tab-bar"></div>
     <div class="editor-wrap">
@@ -1003,7 +1043,7 @@
     </div>
     <div class="modal-body">
       <div class="app-name">Tsui Editor</div>
-      <div class="version-line">Version 1.1.0</div>
+      <div class="version-line">Version 1.2.0</div>
 
       <h3 data-i18n="about.section.about">About</h3>
       <p data-i18n-html="about.section.about.body"><strong>Tsui Editor</strong> はブラウザで動くローカルファイルエディタです。File System Access API でフォルダまるごと読み書き、タブ・ツリーで操作。ログイン不要、インストール不要、データの外部送信なし。<br>
@@ -1011,7 +1051,7 @@
 
       <h3 data-i18n="about.section.privacy">Privacy</h3>
       <p data-i18n-html="about.section.privacy.p1">ファイルや入力内容は、本アプリ本体から外部送信されません。CSP の <code>connect-src 'none'</code> により、<code>fetch</code> 等のネットワーク送信はブラウザレベルで禁止されています。DevTools の Network タブで確認いただけます。</p>
-      <p data-i18n-html="about.section.privacy.p2">ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme・Lang）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。</p>
+      <p data-i18n-html="about.section.privacy.p2">ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme・Lang・サイドバー幅）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。</p>
       <p data-i18n-html="about.section.privacy.p3">本アプリ本体には計測機能は一切含まれていません（上記 CSP により外部送信が禁止されているため）。</p>
       <p data-i18n="about.section.privacy.p4">一方、作者プロフィールや Tsui series のランディングページ等の情報ページでは、訪問数の把握に Cloudflare Web Analytics を利用しています（Cookie なし / フィンガープリントなし / クロスサイトトラッキングなし）。</p>
       <p data-i18n="about.section.privacy.p5">なお、別途プラットフォーム側（配信元サーバや中継事業者等）で計測・記録されている可能性はあります。</p>
@@ -1089,6 +1129,7 @@ const I18N_DICT = {
     'sidebar.settings.theme.calm.title': 'calm (default)',
 
     'sidebar.about.title': 'このアプリについて',
+    'sidebar.resizer.aria': 'サイドバーの幅を調整',
 
     'editor.empty.title': 'ファイルが選択されていません',
     'editor.empty.hint': '左のファイルツリーからファイルを選択<br>もしくは「フォルダを開く」で作業を開始',
@@ -1105,7 +1146,7 @@ const I18N_DICT = {
     'about.section.about.body': '<strong>Tsui Editor</strong> はブラウザで動くローカルファイルエディタです。File System Access API でフォルダまるごと読み書き、タブ・ツリーで操作。ログイン不要、インストール不要、データの外部送信なし。<br>— <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">詳細</a> —',
     'about.section.privacy': 'Privacy',
     'about.section.privacy.p1': 'ファイルや入力内容は、本アプリ本体から外部送信されません。CSP の <code>connect-src \'none\'</code> により、<code>fetch</code> 等のネットワーク送信はブラウザレベルで禁止されています。DevTools の Network タブで確認いただけます。',
-    'about.section.privacy.p2': 'ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme・Lang）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。',
+    'about.section.privacy.p2': 'ファイルや入力内容自体は <code>localStorage</code> や <code>IndexedDB</code> に保存しません。これらは File System Access API 経由で選択されたフォルダの中にのみ存在します。なお、UI 設定（フォントサイズ・折り返し・Sys Font・Theme・Lang・サイドバー幅）は <code>localStorage</code> に、前回フォルダへの再アクセス用ハンドルは <code>IndexedDB</code> に保存しています。',
     'about.section.privacy.p3': '本アプリ本体には計測機能は一切含まれていません（上記 CSP により外部送信が禁止されているため）。',
     'about.section.privacy.p4': '一方、作者プロフィールや Tsui series のランディングページ等の情報ページでは、訪問数の把握に Cloudflare Web Analytics を利用しています（Cookie なし / フィンガープリントなし / クロスサイトトラッキングなし）。',
     'about.section.privacy.p5': 'なお、別途プラットフォーム側（配信元サーバや中継事業者等）で計測・記録されている可能性はあります。',
@@ -1248,6 +1289,7 @@ const I18N_DICT = {
     'sidebar.settings.theme.calm.title': 'calm (default)',
 
     'sidebar.about.title': 'About this app',
+    'sidebar.resizer.aria': 'Resize the sidebar',
 
     'editor.empty.title': 'No file selected',
     'editor.empty.hint': 'Choose a file from the tree on the left,<br>or click "Open folder" to start.',
@@ -1264,7 +1306,7 @@ const I18N_DICT = {
     'about.section.about.body': '<strong>Tsui Editor</strong> is a browser-based local file editor. It uses the File System Access API to read and write entire folders, with tab and tree navigation. No login, no install, no outbound traffic.<br>— <a href="https://github.com/hajimetwi3/misc/tree/main/docs/tools/tsui-editor" target="_blank" rel="noopener noreferrer">Details</a> —',
     'about.section.privacy': 'Privacy',
     'about.section.privacy.p1': 'Files and editor input are not sent outside this app. The CSP <code>connect-src \'none\'</code> directive blocks <code>fetch</code> and other network requests at the browser level. You can verify this in the DevTools Network tab.',
-    'about.section.privacy.p2': 'Files and editor input themselves are not stored in <code>localStorage</code> or <code>IndexedDB</code>. They live only inside the folder you selected via the File System Access API. UI preferences (font size, wrap, Sys Font, Theme, Lang) are stored in <code>localStorage</code>, and a handle for reconnecting to the previous folder is stored in <code>IndexedDB</code>.',
+    'about.section.privacy.p2': 'Files and editor input themselves are not stored in <code>localStorage</code> or <code>IndexedDB</code>. They live only inside the folder you selected via the File System Access API. UI preferences (font size, wrap, Sys Font, Theme, Lang, sidebar width) are stored in <code>localStorage</code>, and a handle for reconnecting to the previous folder is stored in <code>IndexedDB</code>.',
     'about.section.privacy.p3': 'This app itself contains no analytics (the CSP above blocks any outbound traffic).',
     'about.section.privacy.p4': 'Information pages such as the author profile and the Tsui series landing page do use Cloudflare Web Analytics for visit counts (no cookies, no fingerprinting, no cross-site tracking).',
     'about.section.privacy.p5': 'Note that the platform itself (hosting provider, intermediaries, etc.) may also log requests independently.',
@@ -1533,8 +1575,13 @@ function decodeBytes(arrayBuffer) {
 }
 
 function detectEol(text) {
+
   
-  const sample = text.length > 65536 ? text.slice(0, 65536) : text;
+  
+  let sample = text.length > 65536 ? text.slice(0, 65536) : text;
+  if (text.length > 65536 && (!/[\r\n]/.test(sample) || sample.endsWith('\r'))) {
+    sample = text;
+  }
   let lf = 0, crlf = 0, cr = 0;
   for (let i = 0; i < sample.length; i++) {
     const c = sample.charCodeAt(i);
@@ -1550,14 +1597,16 @@ function detectEol(text) {
   return 'LF';
 }
 
+function normalizeEol(text, eol) {
+  const lf = text.replace(/\r\n?|\n/g, '\n');
+  if (eol === 'CRLF') return lf.replace(/\n/g, '\r\n');
+  if (eol === 'CR')   return lf.replace(/\n/g, '\r');
+  return lf;
+}
+
 function encodeForSave(text, meta) {
   
-  let normalized = text;
-  if (meta.eol === 'CRLF') {
-    normalized = text.replace(/\r?\n/g, '\r\n');
-  } else if (meta.eol === 'CR') {
-    normalized = text.replace(/\r?\n/g, '\r');
-  }
+  const normalized = normalizeEol(text, meta.eol);
 
   const enc = meta.encoding;
   
@@ -1622,6 +1671,15 @@ const VALID_THEMES = ['calm', 'green', 'amber', 'red', 'pink', 'cyber'];
 let themeMode = (() => {
   const v = localStorage.getItem(THEME_KEY);
   return VALID_THEMES.includes(v) ? v : 'calm';
+})();
+
+const SIDEBAR_WIDTH_KEY = 'tsui-editor-sidebar-width';
+const SIDEBAR_DEFAULT = 260;
+const SIDEBAR_MIN = 120;
+const SIDEBAR_MAX_RATIO = 0.7;  
+let sidebarWidth = (() => {
+  const v = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY), 10);
+  return (isFinite(v) && v >= SIDEBAR_MIN) ? v : SIDEBAR_DEFAULT;
 })();
 
 const MOBILE_BP = 768;
@@ -1728,6 +1786,69 @@ document.querySelectorAll('.theme-dot').forEach(b => {
   });
 });
 applyTheme();
+
+function maxSidebarWidth() {
+  return Math.max(SIDEBAR_MIN, Math.floor(window.innerWidth * SIDEBAR_MAX_RATIO));
+}
+function clampSidebarWidth(w) {
+  const max = maxSidebarWidth();
+  if (!isFinite(w)) return SIDEBAR_DEFAULT;
+  if (w < SIDEBAR_MIN) return SIDEBAR_MIN;
+  if (w > max) return max;
+  return w;
+}
+function applySidebarWidth() {
+  sidebarWidth = clampSidebarWidth(sidebarWidth);
+  document.documentElement.style.setProperty('--sidebar-width', sidebarWidth + 'px');
+}
+function persistSidebarWidth() {
+  try { localStorage.setItem(SIDEBAR_WIDTH_KEY, String(sidebarWidth)); } catch {}
+}
+
+applySidebarWidth();
+
+window.addEventListener('resize', () => {
+  const before = sidebarWidth;
+  applySidebarWidth();
+  if (sidebarWidth !== before) persistSidebarWidth();
+});
+
+const $sidebarResizer = document.getElementById('sidebar-resizer');
+if ($sidebarResizer) {
+  let dragStartX = 0;
+  let dragStartWidth = 0;
+  let activePointerId = null;
+
+  function onPointerMove(e) {
+    if (e.pointerId !== activePointerId) return;
+    const delta = e.clientX - dragStartX;
+    sidebarWidth = clampSidebarWidth(dragStartWidth + delta);
+    document.documentElement.style.setProperty('--sidebar-width', sidebarWidth + 'px');
+  }
+  function onPointerUp(e) {
+    if (e.pointerId !== activePointerId) return;
+    activePointerId = null;
+    document.body.classList.remove('sidebar-resizing');
+    $sidebarResizer.removeEventListener('pointermove', onPointerMove);
+    $sidebarResizer.removeEventListener('pointerup', onPointerUp);
+    $sidebarResizer.removeEventListener('pointercancel', onPointerUp);
+    try { $sidebarResizer.releasePointerCapture(e.pointerId); } catch {}
+    persistSidebarWidth();
+  }
+  $sidebarResizer.addEventListener('pointerdown', (e) => {
+    if (isMobile()) return;            
+    if (e.button !== 0 && e.pointerType === 'mouse') return;  
+    activePointerId = e.pointerId;
+    dragStartX = e.clientX;
+    dragStartWidth = sidebarWidth;
+    document.body.classList.add('sidebar-resizing');
+    try { $sidebarResizer.setPointerCapture(e.pointerId); } catch {}
+    $sidebarResizer.addEventListener('pointermove', onPointerMove);
+    $sidebarResizer.addEventListener('pointerup', onPointerUp);
+    $sidebarResizer.addEventListener('pointercancel', onPointerUp);
+    e.preventDefault();
+  });
+}
 
 let lastFolderName = null;  
 
@@ -2216,8 +2337,12 @@ async function openInTab(fileHandle, path) {
 
     const buf = await file.arrayBuffer();
     const decoded = decodeBytes(buf);
-    const text = decoded.text;
-    const eol = detectEol(text);
+    const rawText = decoded.text;
+    
+    const eol = detectEol(rawText);
+
+    
+    const text = normalizeEol(rawText, 'LF');
 
     tabs.push({
       path, handle: fileHandle,
@@ -2438,7 +2563,10 @@ async function saveActive() {
       await writeWith(freshHandle);
     }
 
-    t.originalContent = t.content;
+    
+    const cleanContent = normalizeEol(t.content, 'LF');
+    t.content = cleanContent;
+    t.originalContent = cleanContent;
     t.originalBytes = result.bytes.byteLength;
     t.metaDirty = false;
     updateSaveButton();
@@ -2516,6 +2644,7 @@ function markDirty() {
   const t = tabs[activeTabIndex];
 
   t.metaDirty = true;
+  updateSaveButton();
   renderTabs();
 }
 
@@ -2546,15 +2675,18 @@ async function reloadWithEncoding(encoding, hasBom) {
       text = new TextDecoder(label).decode(bytes);
     }
 
-    t.content = text;
-    t.originalContent = text;
+    const eol = detectEol(text);
+    const normalizedText = normalizeEol(text, 'LF');
+
+    t.content = normalizedText;
+    t.originalContent = normalizedText;
     t.originalBytes = file.size;
     t.encoding = encoding;
     t.hasBom = hasBom;
-    t.eol = detectEol(text);
+    t.eol = eol;
     t.readonly = (file.size >= SIZE_READONLY);
     t.metaDirty = false;
-    $editor.value = text;
+    $editor.value = normalizedText;
     $editor.readOnly = !!t.readonly;
     updateSaveButton();
     updateStatus();
