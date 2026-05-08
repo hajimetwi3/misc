@@ -2,6 +2,15 @@
 
 All notable changes to Tsui keys will be documented in this file.
 
+## [1.2.0] - 2026-05-09  
+
+### Added
+
+- サイドバーとエディタ領域の境界をドラッグして、サイドバーの幅を自由に調整できるようにしました
+- エンコーディング / BOM / 改行コード関連のバグを修正
+
+詳細は [readme.md](readme.md) を参照してください。  
+
 ## [1.1.0] - 2026-05-08
 
 ### Added
