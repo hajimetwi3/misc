@@ -31,6 +31,9 @@ h1{text-align:center;color:#fff}
 .tradingview-widget-container{height:432px !important}
 .tradingview-widget-container__widget{height:calc(100% - 32px)}
 .tradingview-widget-copyright{text-align:center;font-size:13px;line-height:32px;color:#aaa}
+
+.linkonly{text-align:center;padding:30px 15px;color:#aaa;font-size:.9em;line-height:1.8}
+.linkonly a{color:#2962ff;font-size:1.1em}
 .tradingview-widget-copyright a{color:#2962ff;text-decoration:none}
 footer{text-align:center;margin-top:60px;font-size:.9em;color:#888}
 @media (max-width:1100px){.panel{grid-template-columns:1fr}}
@@ -53,7 +56,7 @@ footer{text-align:center;margin-top:60px;font-size:.9em;color:#888}
 <footer>データは参考値です（※CFD版は実際の指数とほぼ連動）</footer>
 
 <script>
-// [タブ名, [[タイトル, シンボル, 補足], ...]]
+// [タブ名, [[タイトル, シンボル, 補足, ('link'なら埋め込まずリンクのみ)], ...]]
 var TABS = [
   ['為替・商品', [
     ['ドル円', 'OANDA:USDJPY', ''],
@@ -69,7 +72,8 @@ var TABS = [
   ]],
   ['半導体', [
     ['半導体ETF SOXX', 'NASDAQ:SOXX', ''],
-    ['SOXL 半導体ブル3倍', 'AMEX:SOXL', '']
+    ['SOXL 半導体3倍', 'AMEX:SOXL', ''],
+    ['キオクシア', 'TSE:285A', '', 'link']  // 'link' = 埋め込み不可の銘柄。TradingViewへのリンクだけ表示
   ]]
 ];
 
@@ -85,6 +89,14 @@ function build(i) {
     box.innerHTML = '<div class="chart-title"></div><div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>'
       + '<div class="tradingview-widget-copyright"><a rel="noopener nofollow" target="_blank"><span class="blue-text"></span></a><span class="trademark"> by TradingView</span></div></div>';
     box.children[0].textContent = c[0] + '（' + c[1] + '）' + c[2];
+    if (c[3] === 'link') {
+      box.children[1].outerHTML = '<p class="linkonly"><a rel="noopener nofollow" target="_blank"></a><br>※この銘柄は埋め込み表示できないため、TradingViewで開きます</p>';
+      var l = box.querySelector('.linkonly a');
+      l.href = url;
+      l.textContent = c[1].split(':')[1] + 'のチャートをTradingViewで見る';
+      panel.appendChild(box);
+      return;
+    }
     var a = box.querySelector('.tradingview-widget-copyright a');
     a.href = url;
     a.firstChild.textContent = c[1].split(':')[1] + 'のチャート';
