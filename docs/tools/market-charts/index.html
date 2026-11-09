@@ -1,359 +1,123 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マーケットチャート</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マーケットチャート</title>
 
-    <!-- Clickjacking defense (frame-busting)  -->
-    <style id="antiClickjack">html{display:none !important;}</style>
-    <script>
-    (function(){
-      if (self === top) {
-        var s = document.getElementById('antiClickjack');
-        if (s && s.parentNode) s.parentNode.removeChild(s);
-      } else {
-        try { top.location = self.location; } catch (e) {}
-        try { document.documentElement.innerHTML = ''; } catch (e) {}
-      }
-    })();
-    </script>
+<!-- Clickjacking defense (frame-busting) -->
+<style id="antiClickjack">html{display:none !important;}</style>
+<script>
+(function(){
+  if (self === top) {
+    var s = document.getElementById('antiClickjack');
+    if (s && s.parentNode) s.parentNode.removeChild(s);
+  } else {
+    try { top.location = self.location; } catch (e) {}
+    try { document.documentElement.innerHTML = ''; } catch (e) {}
+  }
+})();
+</script>
 
-    
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #121212;     /* ダーク背景 */
-            color: #e0e0e0;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
-            color: #ffffff;
-        }
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            max-width: 1350px;
-            margin: 0 auto;
-        }
-        .chart-box {
-            background: #1e2128;     /* チャートボックスを暗めに */
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            overflow: hidden;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .chart-title {
-            margin: 0;
-            padding: 18px 25px 10px;
-            background: #2a2f3a;     /* タイトル部分もダーク */
-            font-size: 1.35em;
-            font-weight: 600;
-            border-bottom: 1px solid #333;
-            color: #ffffff;
-        }
-        .tradingview-widget-container {
-            height: 400px;
-            width: 100%;
-            max-width: 380px;
-            margin: 0 auto;
-        }
-        .source {
-            text-align: center;
-            font-size: 0.85em;
-            color: #aaaaaa;
-            padding: 10px 15px 15px;
-            background: #1e2128;
-            border-top: 1px solid #333;
-        }
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            font-size: 0.9em;
-            color: #888;
-        }
-        @media (max-width: 1100px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-    <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "219971a8b25d4506877afc0a72110eb1"}'></script><!-- End Cloudflare Web Analytics -->
+<style>
+body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:20px;background:#121212;color:#e0e0e0}
+h1{text-align:center;color:#fff}
+.tabs{display:flex;justify-content:center;gap:10px;margin-bottom:30px;flex-wrap:wrap}
+.tabs button{background:#2a2f3a;color:#e0e0e0;border:1px solid #444;border-radius:8px;padding:8px 18px;font-size:1em;cursor:pointer}
+.tabs button.on{background:#2962ff;border-color:#2962ff;color:#fff}
+.panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px;max-width:1350px;margin:0 auto}
+.chart-box{background:#1e2128;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.4);overflow:hidden;width:100%;max-width:400px;margin:0 auto}
+.chart-title{margin:0;padding:18px 25px 10px;background:#2a2f3a;font-size:1.35em;font-weight:600;border-bottom:1px solid #333;color:#fff}
+.tradingview-widget-container{height:432px !important}
+.tradingview-widget-container__widget{height:calc(100% - 32px)}
+.tradingview-widget-copyright{text-align:center;font-size:13px;line-height:32px;color:#aaa}
+.tradingview-widget-copyright a{color:#2962ff;text-decoration:none}
+footer{text-align:center;margin-top:60px;font-size:.9em;color:#888}
+@media (max-width:1100px){.panel{grid-template-columns:1fr}}
+@media (max-width:480px){body{padding:12px}}
+</style>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "219971a8b25d4506877afc0a72110eb1"}'></script><!-- End Cloudflare Web Analytics -->
 </head>
 <body>
-    <h1>マーケットチャート</h1>
-
-    <div class="charts-grid">
-
-        <!-- ドル円（一番先頭） -->
-        <div class="chart-box">
-            <div class="chart-title">ドル円（OANDA:USDJPY）</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "OANDA:USDJPY",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（OANDA:USDJPY）</div>
-        </div>
-
-        <!-- WTI原油 -->
-        <div class="chart-box">
-            <div class="chart-title">WTI原油 (TVC:USOIL)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "TVC:USOIL",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（TVC:USOIL）</div>
-        </div>
-
-        <!-- 金/円 -->
-        <div class="chart-box">
-            <div class="chart-title">金/円（OANDA:XAUJPY）</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "OANDA:XAUJPY",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（OANDA:XAUJPY）</div>
-        </div>
-
-        <!-- 銀/円 -->
-        <div class="chart-box">
-            <div class="chart-title">銀/円（OANDA:XAGJPY）</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "OANDA:XAGJPY",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（OANDA:XAGJPY）</div>
-        </div>
-
-        <!-- SOX（フィラデルフィア半導体株指数） -->
-        <div class="chart-box">
-            <div class="chart-title">SOX指数 (NASDAQ:SOX)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "NASDAQ:SOX",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（NASDAQ:SOX フィラデルフィア半導体株指数）</div>
-        </div>
-
-         <!-- SOXL（半導体ブル3倍ETF） -->
-        <div class="chart-box">
-            <div class="chart-title">SOXL 半導体ブル3倍 (AMEX:SOXL)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "AMEX:SOXL",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（AMEX:SOXL ※NYSE Arca上場ETF）</div>
-        </div>
-
-        <!-- ダウ平均（CFD） -->
-        <div class="chart-box">
-            <div class="chart-title">ダウ平均 (BLACKBULL:US30)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "BLACKBULL:US30",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（BLACKBULL:US30 ※CFD）</div>
-        </div>
-
-        <!-- S&P500（CFD） -->
-        <div class="chart-box">
-            <div class="chart-title">S&amp;P500 (CAPITALCOM:US500)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "CAPITALCOM:US500",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（CAPITALCOM:US500 ※CFD）</div>
-        </div>
-
-        <!-- ナスダック（CFD） -->
-        <div class="chart-box">
-            <div class="chart-title">ナスダック (CAPITALCOM:US100)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "CAPITALCOM:US100",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（CAPITALCOM:US100 ※CFD）</div>
-        </div>
-
-        <!-- 日経225先物 -->
-        <div class="chart-box">
-            <div class="chart-title">日経225先物 (OSE:NK2251!)</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                    "autosize": false,
-                    "width": 380,
-                    "height": 400,
-                    "symbol": "OSE:NK2251!",
-                    "interval": "240",
-                    "timezone": "Asia/Tokyo",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ja",
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "support_host": "https://www.tradingview.com"
-                }
-                </script>
-            </div>
-            <div class="source">出典：TradingView（OSE:NK2251!）</div>
-        </div>
-
-    </div>
-
-    <hr />
-
-    <p>Written by Hajime Tsui</p>
-    <ul>
-      <li>GitHubPage: <a href="https://hajimetwi3.github.io/hajimetwi3/">https://hajimetwi3.github.io/hajimetwi3/</a></li>
-      <li>X (Twitter): <a href="https://x.com/hajimetwi3">https://x.com/hajimetwi3</a></li>
-    </ul>
+<h1>マーケットチャート</h1>
+<div class="tabs" id="tabs"></div>
+<div id="charts"></div>
 
 <hr />
+<p>Written by Hajime Tsui</p>
+<ul>
+  <li>GitHubPage: <a href="https://hajimetwi3.github.io/hajimetwi3/">https://hajimetwi3.github.io/hajimetwi3/</a></li>
+  <li>X (Twitter): <a href="https://x.com/hajimetwi3">https://x.com/hajimetwi3</a></li>
+</ul>
+<hr />
+<footer>データは参考値です（※CFD版は実際の指数とほぼ連動）</footer>
 
-    <footer>
-        データは参考値です（※CFD版は実際の指数とほぼ連動）
-    </footer>
+<script>
+// [タブ名, [[タイトル, シンボル, 補足], ...]]
+var TABS = [
+  ['為替・商品', [
+    ['ドル円', 'OANDA:USDJPY', ''],
+    ['WTI原油', 'TVC:USOIL', ''],
+    ['金/円', 'OANDA:XAUJPY', ''],
+    ['銀/円', 'OANDA:XAGJPY', '']
+  ]],
+  ['株価指数', [
+    ['ダウ平均', 'BLACKBULL:US30', ' ※CFD'],
+    ['S&P500', 'CAPITALCOM:US500', ' ※CFD'],
+    ['ナスダック', 'CAPITALCOM:US100', ' ※CFD'],
+    ['日経225先物', 'OSE:NK2251!', '']
+  ]],
+  ['半導体', [
+    ['半導体ETF SOXX', 'NASDAQ:SOXX', ''],
+    ['SOXL 半導体ブル3倍', 'AMEX:SOXL', '']
+  ]]
+];
+
+var panels = [];  // 一度作ったタブは捨てずに再利用（切替時は表示/非表示だけ）
+
+function build(i) {
+  var panel = document.createElement('div');
+  panel.className = 'panel';
+  TABS[i][1].forEach(function (c) {
+    var url = 'https://jp.tradingview.com/symbols/' + c[1].replace(':', '-') + '/';
+    var box = document.createElement('div');
+    box.className = 'chart-box';
+    box.innerHTML = '<div class="chart-title"></div><div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>'
+      + '<div class="tradingview-widget-copyright"><a rel="noopener nofollow" target="_blank"><span class="blue-text"></span></a><span class="trademark"> by TradingView</span></div></div>';
+    box.children[0].textContent = c[0] + '（' + c[1] + '）' + c[2];
+    var a = box.querySelector('.tradingview-widget-copyright a');
+    a.href = url;
+    a.firstChild.textContent = c[1].split(':')[1] + 'のチャート';
+    var s = document.createElement('script');
+    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    s.async = true;
+    s.textContent = JSON.stringify({
+      autosize: true, symbol: c[1], interval: '240',
+      timezone: 'Asia/Tokyo', theme: 'dark', style: '1', locale: 'ja',
+      allow_symbol_change: false, calendar: false, support_host: 'https://www.tradingview.com'
+    });
+    box.querySelector('.tradingview-widget-container').appendChild(s);
+    panel.appendChild(box);
+  });
+  document.getElementById('charts').appendChild(panel);
+  return panel;
+}
+
+function show(i) {
+  if (!panels[i]) panels[i] = build(i);  // 初めて開いたタブだけ読み込む
+  panels.forEach(function (p, j) { if (p) p.style.display = (i === j) ? '' : 'none'; });
+  Array.prototype.forEach.call(document.querySelectorAll('#tabs button'), function (b, j) {
+    b.className = (i === j) ? 'on' : '';
+  });
+}
+
+TABS.forEach(function (t, i) {
+  var b = document.createElement('button');
+  b.textContent = t[0];
+  b.onclick = function () { show(i); };
+  document.getElementById('tabs').appendChild(b);
+});
+show(0);
+</script>
 </body>
 </html>
